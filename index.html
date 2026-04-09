@@ -3,21 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DEDALO TV</title>
+    <title>DEDALO TV | LIVE</title>
     <style>
         :root { --neon: #ff0055; --bg: #000; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; display: flex; justify-content: center; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; display: flex; justify-content: center; overflow-x: hidden; }
         .wrapper { width: 100%; max-width: 420px; padding: 10px; box-sizing: border-box; }
         header { text-align: center; margin-bottom: 20px; }
         .logo-box { background: #0a0a0a; padding: 15px; border-radius: 50px; border: 1px solid #200; display: inline-block; }
         .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 8px var(--neon)); }
         .video-container { width: 100%; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #222; position: relative; }
-        video { width: 100%; aspect-ratio: 16/9; display: block; }
+        video { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
         .info-bar { padding: 15px; background: #0a0a0a; border-top: 1px solid #222; }
         .now-playing { font-size: 10px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
         .video-title { font-size: 14px; font-weight: bold; margin-top: 5px; }
-        .btn { background: #222; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 20px; font-size: 12px; margin: 10px 5px; cursor: pointer; }
-        input, textarea { width: 100%; background: #111; border: 1px solid #333; padding: 12px; color: #fff; margin-top: 10px; border-radius: 8px; box-sizing: border-box; }
+        .btn { background: #222; border: 1px solid #333; color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 12px; margin: 15px 5px; cursor: pointer; transition: 0.3s; }
+        .btn:active { background: var(--neon); }
+        .form-box { margin-top: 20px; padding: 15px; background: #111; border-radius: 12px; border: 1px solid #222; }
+        input, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 12px; color: #fff; margin-top: 10px; border-radius: 8px; box-sizing: border-box; }
         .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 15px; font-weight: bold; border-radius: 8px; margin-top: 10px; }
     </style>
 </head>
@@ -41,62 +43,7 @@
 
         <button class="btn" onclick="nextVideo()">PROSSIMO VIDEO ⏭</button>
 
-        <div style="margin-top:20px;">
-            <!-- Modifica l'action con il tuo endpoint Formspree reale -->
-            <form action="https://formspree.io/f/MettiloQui" method="POST">
-                <input type="email" name="email" placeholder="Email per download" required>
-                <textarea name="comment" placeholder="Lascia un commento..." required></textarea>
-                <button type="submit" class="sub-btn">INVIA E SCARICA</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
-
-        // Nomi esatti dei file che hai testato e funzionano
-        const playlist = [
-            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" },
-            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think" }
-        ];
-
-        let currentVideoIndex = 0;
-        const player = document.getElementById('dedaloPlayer');
-        const titleDisplay = document.getElementById('videoTitle');
-
-        function loadVideo(index) {
-            const video = playlist[index];
-            // encodeURIComponent gestisce spazi e caratteri speciali
-            const videoUrl = R2_URL + encodeURIComponent(video.file);
-            console.log("Caricamento:", videoUrl);
-            player.src = videoUrl;
-            titleDisplay.innerText = video.title;
-            player.load();
-            // Il play potrebbe essere bloccato dal browser se non c'è interazione,
-            // ma con muted e autoplay dovrebbe partire
-            player.play().catch(e => console.log("Autoplay richiede interazione, clicca sul video"));
-        }
-
-        function nextVideo() {
-            currentVideoIndex = (currentVideoIndex + 1) % playlist.length;
-            loadVideo(currentVideoIndex);
-        }
-
-        // Quando un video finisce, passa al successivo automaticamente
-        player.onended = nextVideo;
-
-        // Avvia il primo video
-        loadVideo(currentVideoIndex);
-    </script>
-</body>
-</html>                <div class="now-playing">In Onda</div>
-                <div id="videoTitle" class="video-title">Caricamento...</div>
-            </div>
-        </div>
-
-        <button class="btn" onclick="nextVideo()">PROSSIMO VIDEO ⏭</button>
-
-        <div style="margin-top:20px;">
+        <div class="form-box">
             <form action="https://formspree.io/f/MettiloQui" method="POST">
                 <input type="email" name="email" placeholder="Email per download" required>
                 <textarea name="comment" placeholder="Lascia un commento..." required></textarea>
@@ -108,10 +55,10 @@
     <script>
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
 
-        // ATTENZIONE: Questi sono i nomi REALI dei file che vedo nello screenshot
+        // Playlist aggiornata con i nomi dei file esatti che hai testato
         const playlist = [
-            { file: "Red think - Badret - Video ufficiale.mp4", title: "BADRET - Red Think" },
-            { file: "Viaggio futuro - Badret.mp4", title: "BADRET - Viaggio nel Futuro" }
+            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think (Official Video)" },
+            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" }
         ];
 
         let currentVideoIndex = 0;
@@ -120,13 +67,15 @@
 
         function loadVideo(index) {
             const video = playlist[index];
-            // encodeURIComponent gestisce gli spazi e i caratteri speciali
+            // encodeURIComponent gestisce correttamente gli spazi nei nomi dei file
             const videoUrl = R2_URL + encodeURIComponent(video.file);
-            console.log("Tentativo di caricamento:", videoUrl);
+            console.log("Loading:", videoUrl);
             player.src = videoUrl;
             titleDisplay.innerText = video.title;
             player.load();
-            player.play().catch(e => console.log("Autoplay richiede interazione"));
+            player.play().catch(e => {
+                console.log("Autoplay bloccato dai browser, serve un clic dell'utente.");
+            });
         }
 
         function nextVideo() {
@@ -134,7 +83,10 @@
             loadVideo(currentVideoIndex);
         }
 
+        // Passa al video successivo quando finisce quello attuale
         player.onended = nextVideo;
+
+        // Avvio
         loadVideo(currentVideoIndex);
     </script>
 </body>
