@@ -3,28 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DEDALO TV | LIVE 24/7</title>
+    <title>DEDALO TV</title>
     <style>
-        :root { --neon: #ff0055; --bg: #000000; --panel: #111111; }
-        body { background: var(--bg); color: #e0e0e0; font-family: sans-serif; margin: 0; display: flex; justify-content: center; overflow-x: hidden; }
+        :root { --neon: #ff0055; --bg: #000; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; display: flex; justify-content: center; }
         .wrapper { width: 100%; max-width: 420px; padding: 10px; box-sizing: border-box; }
-        header { text-align: center; margin-bottom: 20px; padding-top: 10px; }
+        header { text-align: center; margin-bottom: 20px; }
         .logo-box { background: #0a0a0a; padding: 15px; border-radius: 50px; border: 1px solid #200; display: inline-block; }
         .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 8px var(--neon)); }
         .video-container { width: 100%; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #222; position: relative; }
-        video { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
-        .live-indicator { position: absolute; top: 12px; left: 12px; background: rgba(255,0,0,0.8); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 5; display: flex; align-items: center; gap: 5px; }
-        .dot { width: 6px; height: 6px; background: white; border-radius: 50%; animation: blink 1s infinite; }
-        .info-bar { padding: 15px; background: #0a0a0a; }
-        .now-playing { font-size: 10px; color: var(--neon); font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-        .video-title { font-size: 14px; font-weight: bold; color: #fff; }
-        .action-bar { display: flex; gap: 8px; padding: 10px 15px; overflow-x: auto; scrollbar-width: none; }
-        .btn { background: #222; border: 1px solid #333; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 12px; cursor: pointer; white-space: nowrap; }
-        .btn-sub { background: #fff; color: #000; font-weight: bold; border: none; }
-        .form-box { margin-top: 20px; padding: 15px; background: var(--panel); border-radius: 12px; border: 1px solid #222; }
-        input, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 12px; color: #fff; margin-bottom: 10px; border-radius: 6px; box-sizing: border-box; }
-        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        video { width: 100%; aspect-ratio: 16/9; display: block; }
+        .info-bar { padding: 15px; background: #0a0a0a; border-top: 1px solid #222; }
+        .now-playing { font-size: 10px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
+        .video-title { font-size: 14px; font-weight: bold; margin-top: 5px; }
+        .btn { background: #222; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 20px; font-size: 12px; margin: 10px 5px; cursor: pointer; }
+        input, textarea { width: 100%; background: #111; border: 1px solid #333; padding: 12px; color: #fff; margin-top: 10px; border-radius: 8px; box-sizing: border-box; }
+        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 15px; font-weight: bold; border-radius: 8px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -36,7 +30,6 @@
         </header>
 
         <div class="video-container">
-            <div class="live-indicator"><div class="dot"></div> DEDALO TV LIVE</div>
             <video id="dedaloPlayer" controls autoplay muted playsinline>
                 <source src="" type="video/mp4">
             </video>
@@ -46,15 +39,11 @@
             </div>
         </div>
 
-        <div class="action-bar">
-            <button class="btn" onclick="nextVideo()">PROSSIMO VIDEO ⏭</button>
-            <button class="btn btn-sub">SUBSCRIBE</button>
-            <button class="btn">👍 LIKE</button>
-        </div>
+        <button class="btn" onclick="nextVideo()">PROSSIMO VIDEO ⏭</button>
 
-        <div class="form-box">
+        <div style="margin-top:20px;">
             <form action="https://formspree.io/f/MettiloQui" method="POST">
-                <input type="email" name="email" placeholder="Email per download compilation" required>
+                <input type="email" name="email" placeholder="Email per download" required>
                 <textarea name="comment" placeholder="Lascia un commento..." required></textarea>
                 <button type="submit" class="sub-btn">INVIA E SCARICA</button>
             </form>
@@ -64,9 +53,9 @@
     <script>
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
 
-        // Playlist con i nomi esatti dei file che vedo nei tuoi screenshot
+        // ATTENZIONE: Questi sono i nomi REALI dei file che vedo nello screenshot
         const playlist = [
-            { file: "Red Think - Badret - Video ufficiale.mp4", title: "BADRET - Red Think (Official Video)" },
+            { file: "Red think - Badret - Video ufficiale.mp4", title: "BADRET - Red Think" },
             { file: "Viaggio futuro - Badret.mp4", title: "BADRET - Viaggio nel Futuro" }
         ];
 
@@ -76,11 +65,13 @@
 
         function loadVideo(index) {
             const video = playlist[index];
-            // EncodeURIComponent serve per gestire gli spazi nel nome del file
-            player.src = R2_URL + encodeURIComponent(video.file);
+            // encodeURIComponent gestisce gli spazi e i caratteri speciali
+            const videoUrl = R2_URL + encodeURIComponent(video.file);
+            console.log("Tentativo di caricamento:", videoUrl);
+            player.src = videoUrl;
             titleDisplay.innerText = video.title;
             player.load();
-            player.play().catch(e => console.log("Autoplay richiede interazione."));
+            player.play().catch(e => console.log("Autoplay richiede interazione"));
         }
 
         function nextVideo() {
