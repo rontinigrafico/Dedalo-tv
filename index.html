@@ -3,63 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DEDALO MUSIC DISTRIBUTION</title>
+    <title>DEDALO TV | LIVE 24/7</title>
     <style>
-        :root { --neon: #ff0055; --bg: #000000; --panel: #111111; --text: #e0e0e0; }
-        
-        /* Reset & Base */
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; display: flex; justify-content: center; overflow-x: hidden; }
-        button, input, textarea { font-family: inherit; outline: none; -webkit-tap-highlight-color: transparent; }
-
-        .wrapper { width: 100%; max-width: 420px; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
-        
-        /* Header & Logo - CORRETTO SPAZIATURA */
-        header { text-align: center; margin-bottom: 25px; width: 100%; display: flex; flex-direction: column; align-items: center; }
-        .logo-box { background: linear-gradient(180deg, #1a000a 0%, #000 100%); padding: 20px; border-radius: 100px; margin-bottom: 10px; border: 1px solid #200; box-shadow: 0 0 30px rgba(255,0,85,0.15); }
-        .logo-img { width: 160px; height: auto; display: block; filter: drop-shadow(0 0 10px rgba(255,0,85,0.5)); }
-        .brand { font-size: 10px; letter-spacing: 4px; color: #888; text-transform: uppercase; margin-top: 5px; font-weight: 300; }
-        .headline { font-size: 10px; color: var(--neon); margin-top: 15px; font-weight: bold; letter-spacing: 1px; max-width: 280px; }
-
-        /* Video Player Area - PRONTO PER R2 */
-        .video-container { width: 100%; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-        .player-wrapper { width: 100%; aspect-ratio: 16/9; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
-        
-        /* Video reale (Sostituisci il link dopo src=) */
-        video { width: 100%; height: 100%; object-fit: cover; }
-
-        .live-indicator { position: absolute; top: 12px; left: 12px; background: rgba(255,0,0,0.9); padding: 5px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; display: flex; align-items: center; gap: 5px; z-index: 10; }
-        .live-dot { width: 6px; height: 6px; background: white; border-radius: 50%; animation: pulse 1s infinite; }
-        
-        /* Video Info & YouTube Buttons - RESI ATTIVI */
-        .video-info { padding: 15px; }
-        .video-title { font-size: 15px; font-weight: bold; margin-bottom: 15px; color: #fff; line-height: 1.3; }
-        .action-bar { display: flex; gap: 8px; margin-bottom: 5px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-        .action-bar::-webkit-scrollbar { display: none; }
-        
-        .btn { background: #222; border: 1px solid #333; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap; }
-        /* Effetto al tocco/click */
-        .btn:active { background: #444; transform: scale(0.97); }
-        .btn.active { background: var(--neon); border-color: var(--neon); }
-        
+        :root { --neon: #ff0055; --bg: #000000; --panel: #111111; }
+        body { background: var(--bg); color: #e0e0e0; font-family: sans-serif; margin: 0; display: flex; justify-content: center; overflow-x: hidden; }
+        .wrapper { width: 100%; max-width: 420px; padding: 10px; box-sizing: border-box; }
+        header { text-align: center; margin-bottom: 20px; padding-top: 10px; }
+        .logo-box { background: #0a0a0a; padding: 15px; border-radius: 50px; border: 1px solid #200; display: inline-block; }
+        .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 8px var(--neon)); }
+        .video-container { width: 100%; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #222; position: relative; }
+        video { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
+        .live-indicator { position: absolute; top: 12px; left: 12px; background: rgba(255,0,0,0.8); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 5; display: flex; align-items: center; gap: 5px; }
+        .dot { width: 6px; height: 6px; background: white; border-radius: 50%; animation: blink 1s infinite; }
+        .info-bar { padding: 15px; background: #0a0a0a; }
+        .now-playing { font-size: 10px; color: var(--neon); font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
+        .video-title { font-size: 14px; font-weight: bold; color: #fff; }
+        .action-bar { display: flex; gap: 8px; padding: 10px 15px; overflow-x: auto; scrollbar-width: none; }
+        .btn { background: #222; border: 1px solid #333; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 12px; cursor: pointer; white-space: nowrap; }
         .btn-sub { background: #fff; color: #000; font-weight: bold; border: none; }
-        .btn-sub:active { background: #ccc; }
-
-        /* Stats Section */
-        .stats-grid { width: 100%; background: var(--panel); border-radius: 12px; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 11px; color: #777; border: 1px solid #222; margin-top: 15px; box-sizing: border-box; }
-        .stats-grid b { color: #fff; display: block; font-size: 14px; margin-top: 2px; }
-
-        /* Chat & Form */
-        .chat-area { width: 100%; margin-top: 25px; border-top: 1px solid #222; padding-top: 20px; box-sizing: border-box; }
-        .chat-title { font-size: 12px; color: #555; text-transform: uppercase; margin-bottom: 15px; font-weight: bold; text-align: center; }
-        
-        .comment-form { display: flex; flex-direction: column; gap: 10px; }
-        input, textarea { background: #111; border: 1px solid #333; border-radius: 8px; padding: 15px; color: #fff; font-size: 14px; -webkit-appearance: none; }
-        input:focus, textarea:focus { border-color: var(--neon); background: #1a1a1a; }
-        
-        .submit-btn { background: linear-gradient(180deg, #ff0055 0%, #cc0044 100%); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; box-shadow: 0 4px 15px rgba(255,0,85,0.3); transition: 0.2s; }
-        .submit-btn:active { transform: scale(0.98); box-shadow: 0 2px 5px rgba(255,0,85,0.3); }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        .form-box { margin-top: 20px; padding: 15px; background: var(--panel); border-radius: 12px; border: 1px solid #222; }
+        input, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 12px; color: #fff; margin-bottom: 10px; border-radius: 6px; box-sizing: border-box; }
+        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -68,50 +33,63 @@
             <div class="logo-box">
                 <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" alt="DEDALO LOGO" class="logo-img">
             </div>
-            <div class="brand">Music Distribution</div>
-            <div class="headline">DEDALO TV | LIVE 24/7 | CATHODE RAYS ADDICTED</div>
         </header>
 
         <div class="video-container">
-            <div class="player-wrapper">
-                <div class="live-indicator"><div class="live-dot"></div> LIVE</div>
-                
-                <video poster="https://via.placeholder.com/640x360/000000/ff0055?text=LOADING+STREAM..." controls autoplay muted playsinline>
-                    <source src="LINK_DEL_VIDEO_SU_R2.mp4" type="video/mp4">
-                    Il tuo browser non supporta il tag video.
-                </video>
-            </div>
-            <div class="video-info">
-                <div class="video-title">ARTIST OF THE WEEK: BADRET - NEON ECLIPSE (OFFICIAL VIZUALIZER)</div>
-                <div class="action-bar">
-                    <button class="btn active" onclick="this.classList.toggle('active')">👍 2.4k</button>
-                    <button class="btn">↪ SHARE</button>
-                    <button class="btn">➕ SAVE</button>
-                    <button class="btn btn-sub">SUBSCRIBE</button>
-                </div>
+            <div class="live-indicator"><div class="dot"></div> DEDALO TV LIVE</div>
+            <video id="dedaloPlayer" controls autoplay muted playsinline>
+                <source src="" type="video/mp4">
+            </video>
+            <div class="info-bar">
+                <div class="now-playing">In Onda</div>
+                <div id="videoTitle" class="video-title">Caricamento...</div>
             </div>
         </div>
 
-        <div class="stats-grid">
-            <div>TOTAL STREAMERS<b>21,342</b></div>
-            <div>CURRENTLY LISTENING<b>842</b></div>
+        <div class="action-bar">
+            <button class="btn" onclick="nextVideo()">PROSSIMO VIDEO ⏭</button>
+            <button class="btn btn-sub">SUBSCRIBE</button>
+            <button class="btn">👍 LIKE</button>
         </div>
 
-        <div class="chat-area">
-            <div class="chat-title">Join the Cathode Conversation</div>
-            
-            <form action="https://formspree.io/f/MettiloQui" method="POST" class="comment-form">
-                <input type="text" name="name" placeholder="Il tuo nome" required>
-                <input type="email" name="email" placeholder="La tua email per l'accesso" required>
-                <textarea name="comment" rows="3" placeholder="Scrivi un commento..." required></textarea>
-                <button type="submit" class="submit-btn">Submit & Get Access</button>
+        <div class="form-box">
+            <form action="https://formspree.io/f/MettiloQui" method="POST">
+                <input type="email" name="email" placeholder="Email per download compilation" required>
+                <textarea name="comment" placeholder="Lascia un commento..." required></textarea>
+                <button type="submit" class="sub-btn">INVIA E SCARICA</button>
             </form>
         </div>
-
-        <footer style="margin-top: 50px; text-align: center; opacity: 0.2; font-size: 10px; padding-bottom: 20px;">
-            DEDALO DISTRIBUTION &copy; 2026<br>
-            Powered by Cloudflare R2 & GitHub Edge
-        </footer>
     </div>
+
+    <script>
+        const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
+
+        // Playlist con i nomi esatti dei file che vedo nei tuoi screenshot
+        const playlist = [
+            { file: "Red Think - Badret - Video ufficiale.mp4", title: "BADRET - Red Think (Official Video)" },
+            { file: "Viaggio futuro - Badret.mp4", title: "BADRET - Viaggio nel Futuro" }
+        ];
+
+        let currentVideoIndex = 0;
+        const player = document.getElementById('dedaloPlayer');
+        const titleDisplay = document.getElementById('videoTitle');
+
+        function loadVideo(index) {
+            const video = playlist[index];
+            // EncodeURIComponent serve per gestire gli spazi nel nome del file
+            player.src = R2_URL + encodeURIComponent(video.file);
+            titleDisplay.innerText = video.title;
+            player.load();
+            player.play().catch(e => console.log("Autoplay richiede interazione."));
+        }
+
+        function nextVideo() {
+            currentVideoIndex = (currentVideoIndex + 1) % playlist.length;
+            loadVideo(currentVideoIndex);
+        }
+
+        player.onended = nextVideo;
+        loadVideo(currentVideoIndex);
+    </script>
 </body>
 </html>
