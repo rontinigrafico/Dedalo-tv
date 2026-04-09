@@ -3,81 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DEDALO TV | LIVE</title>
+    <title>DEDALO TV</title>
     <style>
-        :root { --neon: #ff0055; --bg: #000; --panel: #111; }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; margin: 0; display: flex; justify-content: center; overflow-x: hidden; }
+        :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #888; }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; margin: 0; display: flex; justify-content: center; }
         
-        .wrapper { width: 100%; max-width: 420px; padding: 10px; box-sizing: border-box; }
+        .wrapper { width: 100%; max-width: 420px; padding: 15px; box-sizing: border-box; }
         
-        /* Header & Logo */
-        header { text-align: center; margin-bottom: 25px; padding-top: 20px; }
-        .logo-box { background: #0a0a0a; padding: 15px; border-radius: 50px; border: 1px solid #200; display: inline-block; margin-bottom: 5px; }
-        .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 8px var(--neon)); }
-        .brand { font-size: 11px; letter-spacing: 4px; color: #888; text-transform: uppercase; font-weight: 300; }
+        /* Header */
+        header { text-align: center; margin-bottom: 30px; padding-top: 10px; }
+        .logo-img { width: 150px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.4)); }
+        .brand { font-size: 10px; letter-spacing: 5px; color: var(--gray); text-transform: uppercase; margin-top: 5px; }
 
-        /* Video Player */
-        .video-container { width: 100%; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #222; position: relative; box-shadow: 0 0 30px rgba(255,0,85,0.1); }
-        video { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
+        /* Video Area */
+        .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #1a1a1a; position: relative; }
+        video { width: 100%; aspect-ratio: 16/9; display: block; }
         
-        /* Overlay Attiva Audio */
-        #audioOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 20; cursor: pointer; transition: 0.3s; }
-        .audio-btn { background: var(--neon); color: white; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 14px; text-transform: uppercase; border: 2px solid white; box-shadow: 0 0 20px var(--neon); animation: pulse 1.5s infinite; }
+        /* Overlay Audio Gigante */
+        #audioOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 20; cursor: pointer; }
+        .audio-icon { font-size: 40px; color: var(--neon); animation: pulse 1.5s infinite; }
 
-        .info-bar { padding: 15px; background: #0a0a0a; border-top: 1px solid #222; }
-        .now-playing { font-size: 10px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
-        .video-title { font-size: 14px; font-weight: bold; margin-top: 5px; color: #fff; }
+        /* Info Bar */
+        .info-bar { padding: 15px; background: var(--panel); }
+        .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
 
-        /* Action Buttons */
-        .action-bar { display: flex; gap: 8px; margin: 15px 0; overflow-x: auto; scrollbar-width: none; }
-        .btn { background: #222; border: 1px solid #333; color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-        .btn:active { background: #444; transform: scale(0.95); }
-        .btn-sub { background: #fff; color: #000; font-weight: bold; border: none; }
+        /* Icon Menu Minimal */
+        .icon-bar { display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; }
+        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
+        .icon-btn span { font-size: 20px; }
+        .icon-btn label { font-size: 10px; color: var(--gray); text-transform: uppercase; }
+        .icon-btn.active span { color: var(--neon); transform: scale(1.2); }
+        .icon-btn.active label { color: var(--neon); }
+
+        /* Comments Area (Social Proof) */
+        .comments-preview { margin-top: 25px; padding: 0 5px; }
+        .comment-item { margin-bottom: 15px; font-size: 13px; line-height: 1.4; border-left: 1px solid #222; padding-left: 12px; }
+        .user-name { color: var(--neon); font-weight: bold; font-size: 11px; margin-bottom: 2px; display: block; }
+        .comment-text { color: #ccc; }
 
         /* Form area */
-        .form-box { margin-top: 10px; padding: 20px; background: var(--panel); border-radius: 12px; border: 1px solid #222; }
-        input, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 15px; color: #fff; margin-bottom: 12px; border-radius: 8px; box-sizing: border-box; }
-        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
+        .form-box { margin-top: 20px; padding: 20px; background: var(--panel); border-radius: 15px; border: 1px solid #111; }
+        input, textarea { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
+        input:focus { border-color: var(--neon); }
+        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
 
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <header>
-            <div class="logo-box">
-                <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" alt="DEDALO LOGO" class="logo-img">
-            </div>
+            <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" alt="DEDALO LOGO" class="logo-img">
             <div class="brand">Music Distribution</div>
         </header>
 
         <div class="video-container">
             <div id="audioOverlay" onclick="enableAudio()">
-                <div class="audio-btn">🔊 ATTIVA AUDIO</div>
+                <div class="audio-icon">🔊</div>
             </div>
-
             <video id="dedaloPlayer" autoplay muted playsinline>
                 <source src="" type="video/mp4">
             </video>
-            
             <div class="info-bar">
                 <div class="now-playing">In Onda</div>
                 <div id="videoTitle" class="video-title">Sintonizzazione...</div>
             </div>
         </div>
 
-        <div class="action-bar">
-            <button class="btn btn-sub" onclick="alert('Iscrizione salvata!')">SUBSCRIBE</button>
-            <button class="btn" onclick="nextVideo()">NEXT ⏭</button>
-            <button class="btn" onclick="shareVideo()">SHARE ↪</button>
-            <button class="btn">LIKE 👍</button>
+        <div class="icon-bar">
+            <button class="icon-btn" id="likeBtn" onclick="toggleLike()">
+                <span id="likeIcon">♡</span>
+                <label id="likeCount">2.4k</label>
+            </button>
+            <button class="icon-btn" onclick="shareVideo()">
+                <span>⎋</span>
+                <label>Share</label>
+            </button>
+            <button class="icon-btn" onclick="nextVideo()">
+                <span>⏭</span>
+                <label>Next</label>
+            </button>
+            <button class="icon-btn" onclick="alert('Iscrizione completata')">
+                <span>★</span>
+                <label>Sub</label>
+            </button>
+        </div>
+
+        <div class="comments-preview">
+            <div class="comment-item">
+                <span class="user-name">@USER_092</span>
+                <span class="comment-text">La qualità video di Red Think è fuori scala. Virtual Production vera.</span>
+            </div>
+            <div class="comment-item">
+                <span class="user-name">@TECH_ADDICT</span>
+                <span class="comment-text">Badret è il futuro. Finalmente qualcosa di nuovo in Italia.</span>
+            </div>
         </div>
 
         <div class="form-box">
             <form action="https://formspree.io/f/MettiloQui" method="POST">
-                <input type="email" name="email" placeholder="La tua Email per la compilation" required>
-                <textarea name="comment" rows="3" placeholder="Commenta il video..." required></textarea>
-                <button type="submit" class="sub-btn">INVIA E SBLOCCA</button>
+                <input type="email" name="email" placeholder="Email per download compilation" required>
+                <textarea name="comment" rows="2" placeholder="Lascia il tuo feedback..." required></textarea>
+                <button type="submit" class="sub-btn">Sblocca Contenuti</button>
             </form>
         </div>
     </div>
@@ -85,46 +113,65 @@
     <script>
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
         const playlist = [
-            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think (Official Video)" },
-            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" }
+            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think", likes: 2405 },
+            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage", likes: 1892 }
         ];
 
         let currentVideoIndex = 0;
+        let isLiked = false;
         const player = document.getElementById('dedaloPlayer');
         const titleDisplay = document.getElementById('videoTitle');
         const overlay = document.getElementById('audioOverlay');
+        const likeCountLabel = document.getElementById('likeCount');
+        const likeIcon = document.getElementById('likeIcon');
+        const likeBtn = document.getElementById('likeBtn');
 
         function loadVideo(index) {
             const video = playlist[index];
             player.src = R2_URL + encodeURIComponent(video.file);
             titleDisplay.innerText = video.title;
+            likeCountLabel.innerText = formatLikes(video.likes);
+            isLiked = false;
+            likeBtn.classList.remove('active');
+            likeIcon.innerText = "♡";
             player.load();
             player.play();
         }
 
-        // Funzione Attiva Audio + Possibile Monetizzazione futura
         function enableAudio() {
             player.muted = false;
             overlay.style.display = 'none';
-            // Qui in futuro: window.open('https://link-monetizzazione.com', '_blank');
+        }
+
+        function toggleLike() {
+            let currentLikes = playlist[currentVideoIndex].likes;
+            if (!isLiked) {
+                currentLikes++;
+                likeIcon.innerText = "♥";
+                likeBtn.classList.add('active');
+                isLiked = true;
+            } else {
+                currentLikes--;
+                likeIcon.innerText = "♡";
+                likeBtn.classList.remove('active');
+                isLiked = false;
+            }
+            likeCountLabel.innerText = formatLikes(currentLikes);
+        }
+
+        function formatLikes(num) {
+            return num >= 1000 ? (num / 1000).toFixed(1) + 'k' : num;
+        }
+
+        function shareVideo() {
+            if (navigator.share) {
+                navigator.share({ title: 'DEDALO TV', url: window.location.href });
+            }
         }
 
         function nextVideo() {
             currentVideoIndex = (currentVideoIndex + 1) % playlist.length;
             loadVideo(currentVideoIndex);
-        }
-
-        // Condivisione Reale
-        function shareVideo() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'DEDALO TV - ' + playlist[currentVideoIndex].title,
-                    text: 'Guarda Badret su Dedalo TV!',
-                    url: window.location.href
-                });
-            } else {
-                alert("Copia il link: " + window.location.href);
-            }
         }
 
         player.onended = nextVideo;
