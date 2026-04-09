@@ -1,1 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEDALO TV | LIVE 24/7</title>
+    <style>
+        :root { --neon: #ff0055; --bg: #0a0a0a; --panel: #1a1a1a; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; justify-content: center; }
+        .phone-container { width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; }
+        header { text-align: center; margin-bottom: 20px; }
+        .logo { font-weight: bold; letter-spacing: 2px; color: var(--neon); font-size: 24px; text-transform: uppercase; }
+        
+        /* Video Player Placeholder */
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; border: 1px solid #333; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .live-tag { position: absolute; top: 10px; left: 10px; background: red; padding: 2px 8px; font-size: 10px; font-weight: bold; border-radius: 3px; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        /* Minimal Stats */
+        .stats { background: var(--panel); margin-top: 15px; padding: 10px; border-radius: 8px; display: flex; justify-content: space-around; font-size: 11px; color: #888; border: 1px solid #333; }
+        .stats b { color: white; }
+
+        /* Fake Chat */
+        .chat-container { height: 180px; background: rgba(0,0,0,0.5); border: 1px solid #222; margin-top: 15px; padding: 10px; font-size: 13px; overflow-y: hidden; }
+        .msg { margin-bottom: 8px; }
+        .user { color: var(--neon); font-weight: bold; margin-right: 5px; }
+
+        /* Input */
+        input { width: 100%; padding: 12px; margin-top: 10px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: var(--neon); border: none; color: white; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        
+        footer { margin-top: 30px; display: flex; justify-content: space-around; filter: grayscale(1); opacity: 0.5; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <header>
+            <div class="logo">DEDALO</div>
+            <div style="font-size: 10px; color: #666;">CATHODE RAYS ADDICTED</div>
+        </header>
+
+        <div class="video-box">
+            <div class="live-tag">● LIVE</div>
+            <div style="color: #444; font-size: 12px;">STREAMING ENCRYPTED...</div>
+        </div>
+
+        <div class="stats">
+            <span>STREAMERS: <b>21,342</b></span>
+            <span>LISTENING: <b>842</b></span>
+        </div>
+
+        <div class="chat-container" id="chat">
+            <div class="msg"><span class="user">@SynthWaveFan:</span> Omg this vizualizer is amazing!</div>
+            <div class="msg"><span class="user">@AnalogAesthetic:</span> Synth heaven right here!</div>
+            <div class="msg"><span class="user">@DataDrifter:</span> Dedalo TV has the best vibes.</div>
+        </div>
+
+        <input type="text" placeholder="Your Name">
+        <input type="text" placeholder="Your Message">
+        <button onclick="alert('Monetizzazione attiva...')">SUBMIT COMMENT</button>
+
+        <footer>
+            <span>Spotify</span>
+            <span>Apple Music</span>
+            <span>YouTube</span>
+        </footer>
+    </div>
+</body>
+</html>
 
