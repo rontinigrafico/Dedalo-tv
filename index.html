@@ -5,22 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>DEDALO TV | LIVE</title>
     <style>
-        :root { --neon: #ff0055; --bg: #000; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; display: flex; justify-content: center; overflow-x: hidden; }
+        :root { --neon: #ff0055; --bg: #000; --panel: #111; }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; margin: 0; display: flex; justify-content: center; overflow-x: hidden; }
+        
         .wrapper { width: 100%; max-width: 420px; padding: 10px; box-sizing: border-box; }
-        header { text-align: center; margin-bottom: 20px; }
-        .logo-box { background: #0a0a0a; padding: 15px; border-radius: 50px; border: 1px solid #200; display: inline-block; }
+        
+        /* Header & Logo */
+        header { text-align: center; margin-bottom: 25px; padding-top: 20px; }
+        .logo-box { background: #0a0a0a; padding: 15px; border-radius: 50px; border: 1px solid #200; display: inline-block; margin-bottom: 5px; }
         .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 8px var(--neon)); }
-        .video-container { width: 100%; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #222; position: relative; }
+        .brand { font-size: 11px; letter-spacing: 4px; color: #888; text-transform: uppercase; font-weight: 300; }
+
+        /* Video Player */
+        .video-container { width: 100%; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #222; position: relative; box-shadow: 0 0 30px rgba(255,0,85,0.1); }
         video { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
+        
+        /* Overlay Attiva Audio */
+        #audioOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 20; cursor: pointer; transition: 0.3s; }
+        .audio-btn { background: var(--neon); color: white; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 14px; text-transform: uppercase; border: 2px solid white; box-shadow: 0 0 20px var(--neon); animation: pulse 1.5s infinite; }
+
         .info-bar { padding: 15px; background: #0a0a0a; border-top: 1px solid #222; }
         .now-playing { font-size: 10px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
-        .video-title { font-size: 14px; font-weight: bold; margin-top: 5px; }
-        .btn { background: #222; border: 1px solid #333; color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 12px; margin: 15px 5px; cursor: pointer; transition: 0.3s; }
-        .btn:active { background: var(--neon); }
-        .form-box { margin-top: 20px; padding: 15px; background: #111; border-radius: 12px; border: 1px solid #222; }
-        input, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 12px; color: #fff; margin-top: 10px; border-radius: 8px; box-sizing: border-box; }
-        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 15px; font-weight: bold; border-radius: 8px; margin-top: 10px; }
+        .video-title { font-size: 14px; font-weight: bold; margin-top: 5px; color: #fff; }
+
+        /* Action Buttons */
+        .action-bar { display: flex; gap: 8px; margin: 15px 0; overflow-x: auto; scrollbar-width: none; }
+        .btn { background: #222; border: 1px solid #333; color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+        .btn:active { background: #444; transform: scale(0.95); }
+        .btn-sub { background: #fff; color: #000; font-weight: bold; border: none; }
+
+        /* Form area */
+        .form-box { margin-top: 10px; padding: 20px; background: var(--panel); border-radius: 12px; border: 1px solid #222; }
+        input, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 15px; color: #fff; margin-bottom: 12px; border-radius: 8px; box-sizing: border-box; }
+        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -29,33 +48,42 @@
             <div class="logo-box">
                 <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" alt="DEDALO LOGO" class="logo-img">
             </div>
+            <div class="brand">Music Distribution</div>
         </header>
 
         <div class="video-container">
-            <video id="dedaloPlayer" controls autoplay muted playsinline>
+            <div id="audioOverlay" onclick="enableAudio()">
+                <div class="audio-btn">🔊 ATTIVA AUDIO</div>
+            </div>
+
+            <video id="dedaloPlayer" autoplay muted playsinline>
                 <source src="" type="video/mp4">
             </video>
+            
             <div class="info-bar">
                 <div class="now-playing">In Onda</div>
-                <div id="videoTitle" class="video-title">Caricamento...</div>
+                <div id="videoTitle" class="video-title">Sintonizzazione...</div>
             </div>
         </div>
 
-        <button class="btn" onclick="nextVideo()">PROSSIMO VIDEO ⏭</button>
+        <div class="action-bar">
+            <button class="btn btn-sub" onclick="alert('Iscrizione salvata!')">SUBSCRIBE</button>
+            <button class="btn" onclick="nextVideo()">NEXT ⏭</button>
+            <button class="btn" onclick="shareVideo()">SHARE ↪</button>
+            <button class="btn">LIKE 👍</button>
+        </div>
 
         <div class="form-box">
             <form action="https://formspree.io/f/MettiloQui" method="POST">
-                <input type="email" name="email" placeholder="Email per download" required>
-                <textarea name="comment" placeholder="Lascia un commento..." required></textarea>
-                <button type="submit" class="sub-btn">INVIA E SCARICA</button>
+                <input type="email" name="email" placeholder="La tua Email per la compilation" required>
+                <textarea name="comment" rows="3" placeholder="Commenta il video..." required></textarea>
+                <button type="submit" class="sub-btn">INVIA E SBLOCCA</button>
             </form>
         </div>
     </div>
 
     <script>
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
-
-        // Playlist aggiornata con i nomi dei file esatti che hai testato
         const playlist = [
             { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think (Official Video)" },
             { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" }
@@ -64,18 +92,21 @@
         let currentVideoIndex = 0;
         const player = document.getElementById('dedaloPlayer');
         const titleDisplay = document.getElementById('videoTitle');
+        const overlay = document.getElementById('audioOverlay');
 
         function loadVideo(index) {
             const video = playlist[index];
-            // encodeURIComponent gestisce correttamente gli spazi nei nomi dei file
-            const videoUrl = R2_URL + encodeURIComponent(video.file);
-            console.log("Loading:", videoUrl);
-            player.src = videoUrl;
+            player.src = R2_URL + encodeURIComponent(video.file);
             titleDisplay.innerText = video.title;
             player.load();
-            player.play().catch(e => {
-                console.log("Autoplay bloccato dai browser, serve un clic dell'utente.");
-            });
+            player.play();
+        }
+
+        // Funzione Attiva Audio + Possibile Monetizzazione futura
+        function enableAudio() {
+            player.muted = false;
+            overlay.style.display = 'none';
+            // Qui in futuro: window.open('https://link-monetizzazione.com', '_blank');
         }
 
         function nextVideo() {
@@ -83,10 +114,20 @@
             loadVideo(currentVideoIndex);
         }
 
-        // Passa al video successivo quando finisce quello attuale
-        player.onended = nextVideo;
+        // Condivisione Reale
+        function shareVideo() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'DEDALO TV - ' + playlist[currentVideoIndex].title,
+                    text: 'Guarda Badret su Dedalo TV!',
+                    url: window.location.href
+                });
+            } else {
+                alert("Copia il link: " + window.location.href);
+            }
+        }
 
-        // Avvio
+        player.onended = nextVideo;
         loadVideo(currentVideoIndex);
     </script>
 </body>
