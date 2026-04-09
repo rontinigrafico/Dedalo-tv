@@ -3,68 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEDALO TV | LIVE 24/7</title>
+    <title>DEDALO MUSIC DISTRIBUTION</title>
     <style>
-        :root { --neon: #ff0055; --bg: #0a0a0a; --panel: #1a1a1a; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; justify-content: center; }
-        .phone-container { width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; }
+        :root { --neon: #ff0055; --bg: #0a0a0a; --panel: #141414; --text: #e0e0e0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; display: flex; justify-content: center; }
+        .wrapper { width: 100%; max-width: 420px; padding: 15px; box-sizing: border-box; }
+        
+        /* Header & Logo */
         header { text-align: center; margin-bottom: 20px; }
-        .logo { font-weight: bold; letter-spacing: 2px; color: var(--neon); font-size: 24px; text-transform: uppercase; }
-        
-        /* Video Player Placeholder */
-        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; border: 1px solid #333; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .live-tag { position: absolute; top: 10px; left: 10px; background: red; padding: 2px 8px; font-size: 10px; font-weight: bold; border-radius: 3px; animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        
-        /* Minimal Stats */
-        .stats { background: var(--panel); margin-top: 15px; padding: 10px; border-radius: 8px; display: flex; justify-content: space-around; font-size: 11px; color: #888; border: 1px solid #333; }
-        .stats b { color: white; }
+        .logo-img { width: 180px; height: auto; margin-bottom: 0px; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
+        .brand { font-size: 11px; letter-spacing: 4px; color: #888; text-transform: uppercase; margin-top: -10px; font-weight: 300; }
+        .headline { font-size: 10px; color: var(--neon); margin-top: 15px; font-weight: bold; letter-spacing: 1px; }
 
-        /* Fake Chat */
-        .chat-container { height: 180px; background: rgba(0,0,0,0.5); border: 1px solid #222; margin-top: 15px; padding: 10px; font-size: 13px; overflow-y: hidden; }
-        .msg { margin-bottom: 8px; }
-        .user { color: var(--neon); font-weight: bold; margin-right: 5px; }
-
-        /* Input */
-        input { width: 100%; padding: 12px; margin-top: 10px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: var(--neon); border: none; color: white; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        /* Video Player Area */
+        .video-container { width: 100%; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid #222; }
+        .video-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; position: relative; background: #000; }
+        .live-indicator { position: absolute; top: 12px; left: 12px; background: rgba(255,0,0,0.9); padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; display: flex; align-items: center; gap: 5px; z-index: 10; }
+        .live-dot { width: 6px; height: 6px; background: white; border-radius: 50%; animation: pulse 1s infinite; }
         
-        footer { margin-top: 30px; display: flex; justify-content: space-around; filter: grayscale(1); opacity: 0.5; font-size: 12px; }
+        /* Video Info & YouTube Buttons */
+        .video-info { padding: 15px 10px; }
+        .video-title { font-size: 15px; font-weight: bold; margin-bottom: 12px; color: #fff; }
+        .action-bar { display: flex; gap: 8px; margin-bottom: 10px; overflow-x: auto; scrollbar-width: none; }
+        .btn { background: #222; border: none; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.3s; }
+        .btn:active { background: #444; }
+        .btn-sub { background: #fff; color: #000; font-weight: bold; }
+
+        /* Stats Section */
+        .stats-grid { background: var(--panel); border-radius: 12px; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 11px; color: #777; border: 1px solid #222; margin-top: 10px; }
+        .stats-grid b { color: #fff; display: block; font-size: 14px; margin-top: 2px; }
+
+        /* Chat & Form */
+        .chat-area { margin-top: 20px; border-top: 1px solid #222; padding-top: 20px; }
+        .chat-title { font-size: 12px; color: #555; text-transform: uppercase; margin-bottom: 15px; font-weight: bold; }
+        .msg { font-size: 13px; margin-bottom: 12px; line-height: 1.4; border-left: 2px solid var(--neon); padding-left: 10px; }
+        .user { color: var(--neon); font-weight: bold; font-size: 12px; }
+
+        /* Input Form */
+        .comment-form { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        input, textarea { background: #111; border: 1px solid #333; border-radius: 8px; padding: 14px; color: #fff; font-size: 14px; outline: none; }
+        input:focus, textarea:focus { border-color: var(--neon); }
+        .submit-btn { background: var(--neon); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 5px; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
-    <div class="phone-container">
+    <div class="wrapper">
         <header>
-            <div class="logo">DEDALO</div>
-            <div style="font-size: 10px; color: #666;">CATHODE RAYS ADDICTED</div>
+            <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" alt="DEDALO LOGO" class="logo-img">
+            <div class="brand">Music Distribution</div>
+            <div class="headline">DEDALO TV | LIVE 24/7 | CATHODE RAYS ADDICTED</div>
         </header>
 
-        <div class="video-box">
-            <div class="live-tag">● LIVE</div>
-            <div style="color: #444; font-size: 12px;">STREAMING ENCRYPTED...</div>
+        <div class="video-container">
+            <div class="video-placeholder">
+                <div class="live-indicator"><div class="live-dot"></div> LIVE</div>
+                <img src="https://via.placeholder.com/640x360/000000/ff0055?text=DEDALO+TV+PLAYER" style="width:100%; opacity:0.3;">
+                <div style="position:absolute; font-size:12px; color:#666;">DECRYPTING STREAM...</div>
+            </div>
+            <div class="video-info">
+                <div class="video-title">ARTIST OF THE WEEK: BADRET - NEON ECLIPSE</div>
+                <div class="action-bar">
+                    <button class="btn">👍 2.4k</button>
+                    <button class="btn">↪ SHARE</button>
+                    <button class="btn">➕ SAVE</button>
+                    <button class="btn btn-sub">SUBSCRIBE</button>
+                </div>
+            </div>
         </div>
 
-        <div class="stats">
-            <span>STREAMERS: <b>21,342</b></span>
-            <span>LISTENING: <b>842</b></span>
+        <div class="stats-grid">
+            <div>STREAMERS<b>21,342</b></div>
+            <div>LISTENING<b>842</b></div>
         </div>
 
-        <div class="chat-container" id="chat">
+        <div class="chat-area">
+            <div class="chat-title">Cathode Conversation</div>
             <div class="msg"><span class="user">@SynthWaveFan:</span> Omg this vizualizer is amazing!</div>
             <div class="msg"><span class="user">@AnalogAesthetic:</span> Synth heaven right here!</div>
-            <div class="msg"><span class="user">@DataDrifter:</span> Dedalo TV has the best vibes.</div>
+            
+            <form action="https://formspree.io/f/MettiloQui" method="POST" class="comment-form">
+                <input type="text" name="name" placeholder="Il tuo nome" required>
+                <input type="email" name="email" placeholder="La tua email per il download" required>
+                <textarea name="comment" rows="3" placeholder="Scrivi un commento..." required></textarea>
+                <button type="submit" class="submit-btn">Submit & Get Access</button>
+            </form>
         </div>
 
-        <input type="text" placeholder="Your Name">
-        <input type="text" placeholder="Your Message">
-        <button onclick="alert('Monetizzazione attiva...')">SUBMIT COMMENT</button>
-
-        <footer>
-            <span>Spotify</span>
-            <span>Apple Music</span>
-            <span>YouTube</span>
+        <footer style="margin-top: 40px; text-align: center; opacity: 0.3; font-size: 11px;">
+            DEDALO DISTRIBUTION &copy; 2026<br>
+            Powered by GitHub Edge
         </footer>
     </div>
 </body>
 </html>
-
