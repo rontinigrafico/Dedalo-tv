@@ -42,6 +42,61 @@
         <button class="btn" onclick="nextVideo()">PROSSIMO VIDEO ⏭</button>
 
         <div style="margin-top:20px;">
+            <!-- Modifica l'action con il tuo endpoint Formspree reale -->
+            <form action="https://formspree.io/f/MettiloQui" method="POST">
+                <input type="email" name="email" placeholder="Email per download" required>
+                <textarea name="comment" placeholder="Lascia un commento..." required></textarea>
+                <button type="submit" class="sub-btn">INVIA E SCARICA</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
+
+        // Nomi esatti dei file che hai testato e funzionano
+        const playlist = [
+            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" },
+            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think" }
+        ];
+
+        let currentVideoIndex = 0;
+        const player = document.getElementById('dedaloPlayer');
+        const titleDisplay = document.getElementById('videoTitle');
+
+        function loadVideo(index) {
+            const video = playlist[index];
+            // encodeURIComponent gestisce spazi e caratteri speciali
+            const videoUrl = R2_URL + encodeURIComponent(video.file);
+            console.log("Caricamento:", videoUrl);
+            player.src = videoUrl;
+            titleDisplay.innerText = video.title;
+            player.load();
+            // Il play potrebbe essere bloccato dal browser se non c'è interazione,
+            // ma con muted e autoplay dovrebbe partire
+            player.play().catch(e => console.log("Autoplay richiede interazione, clicca sul video"));
+        }
+
+        function nextVideo() {
+            currentVideoIndex = (currentVideoIndex + 1) % playlist.length;
+            loadVideo(currentVideoIndex);
+        }
+
+        // Quando un video finisce, passa al successivo automaticamente
+        player.onended = nextVideo;
+
+        // Avvia il primo video
+        loadVideo(currentVideoIndex);
+    </script>
+</body>
+</html>                <div class="now-playing">In Onda</div>
+                <div id="videoTitle" class="video-title">Caricamento...</div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="nextVideo()">PROSSIMO VIDEO ⏭</button>
+
+        <div style="margin-top:20px;">
             <form action="https://formspree.io/f/MettiloQui" method="POST">
                 <input type="email" name="email" placeholder="Email per download" required>
                 <textarea name="comment" placeholder="Lascia un commento..." required></textarea>
