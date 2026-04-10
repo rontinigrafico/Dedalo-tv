@@ -12,40 +12,48 @@
 
     <title>DEDALO TV</title>
     <style>
-        :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #888; }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; margin: 0; display: flex; justify-content: center; }
-        .wrapper { width: 100%; max-width: 420px; padding: 15px; box-sizing: border-box; }
+        :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
         
-        header { text-align: center; margin-bottom: 30px; }
-        .logo-img { width: 150px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.4)); }
-        .brand { font-size: 10px; letter-spacing: 5px; color: var(--gray); text-transform: uppercase; margin-top: 5px; }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; margin: 0; display: flex; justify-content: center; }
+        .wrapper { width: 100%; max-width: 420px; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; }
+        
+        header { text-align: center; margin-bottom: 25px; }
+        .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
+        .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
 
-        .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #1a1a1a; position: relative; }
+        /* Video Player Area */
+        .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; }
         video { width: 100%; aspect-ratio: 16/9; display: block; }
         
-        #audioOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 20; cursor: pointer; }
-        .audio-icon { font-size: 40px; color: var(--neon); animation: pulse 1.5s infinite; }
+        #audioOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 20; cursor: pointer; }
+        .audio-icon { font-size: 35px; color: var(--neon); animation: pulse 1.5s infinite; }
 
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; }
-        .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
+        .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
+        .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; letter-spacing: -0.2px; }
 
-        .icon-bar { display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; }
-        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        .icon-btn span { font-size: 20px; }
-        .icon-btn label { font-size: 9px; color: var(--gray); text-transform: uppercase; }
+        /* Icon Menu Minimal - Spostato SOTTO i commenti */
+        .icon-bar { display: flex; justify-content: space-around; padding: 20px 0; order: 3; border-top: 1px solid #111; }
+        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+        .icon-btn span { font-size: 18px; }
+        .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Cusdis Custom Theme */
+        /* Cusdis Integration - Spostato SOPRA (order 2) */
+        #comment-wrapper { order: 2; margin: 20px 0; }
         #cusdis_thread { 
-            margin-top: 30px; 
-            padding: 10px; 
-            background: var(--panel); 
-            border-radius: 15px; 
-            border: 1px solid #111; 
-            min-height: 200px;
+            background: transparent !important; 
+            min-height: 150px;
         }
 
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+        /* Hack per forzare colori Cusdis (Rosa per i nomi) */
+        #cusdis_thread iframe { 
+            color-scheme: dark; 
+            filter: contrast(1.1) brightness(1.1); 
+        }
+
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
+        
+        footer { order: 4; padding: 40px 0; text-align: center; opacity: 0.2; font-size: 10px; letter-spacing: 2px; }
     </style>
 </head>
 <body>
@@ -63,8 +71,19 @@
                 <source src="" type="video/mp4">
             </video>
             <div class="info-bar">
-                <div class="now-playing">Now Playing</div>
+                <div class="now-playing">Direct Broadcast</div>
                 <div id="videoTitle" class="video-title">Tuning in...</div>
+            </div>
+        </div>
+
+        <div id="comment-wrapper">
+            <div id="cusdis_thread"
+              data-host="https://cusdis.com"
+              data-app-id="6437d965-223f-445e-9d54-bc1ccc389ad9"
+              data-page-id="dedalo_tv_main"
+              data-page-url="https://rontinigrafico.github.io/Dedalo-tv/"
+              data-page-title="Dedalo TV"
+              data-theme="dark">
             </div>
         </div>
 
@@ -75,11 +94,11 @@
             </button>
             <button class="icon-btn" onclick="togglePiP()">
                 <span>🔲</span>
-                <label>PiP</label>
+                <label>PiP Mode</label>
             </button>
             <button class="icon-btn" onclick="nextVideo()">
                 <span>⏭</span>
-                <label>Next</label>
+                <label>Next Track</label>
             </button>
             <button class="icon-btn" onclick="shareVideo()">
                 <span>⎋</span>
@@ -87,22 +106,10 @@
             </button>
         </div>
 
-        <div id="cusdis_thread"
-          data-host="https://cusdis.com"
-          data-app-id="6437d965-223f-445e-9d54-bc1ccc389ad9"
-          data-page-id="dedalo_tv_main"
-          data-page-url="https://rontinigrafico.github.io/Dedalo-tv/"
-          data-page-title="Dedalo TV"
-          data-theme="dark">
-        </div>
-        <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-
-        <footer style="margin-top: 50px; text-align: center; opacity: 0.2; font-size: 10px; padding-bottom: 40px;">
-            DEDALO DISTRIBUTION &copy; 2026<br>
-            Powered by GitHub & Cloudflare R2
-        </footer>
+        <footer>DEDALO &copy; 2026</footer>
     </div>
 
+    <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
     <script>
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
         const playlist = [
@@ -119,21 +126,18 @@
             const video = playlist[index];
             player.src = R2_URL + encodeURIComponent(video.file);
             titleDisplay.innerText = video.title;
-            document.getElementById('likeCount').innerText = formatLikes(video.likes);
+            document.getElementById('likeCount').innerText = video.likes >= 1000 ? (video.likes/1000).toFixed(1) + 'k' : video.likes;
             player.load();
             player.play();
         }
 
-        function enableAudio() {
-            player.muted = false;
-            overlay.style.display = 'none';
-        }
-
-        async function togglePiP() {
-            try {
+        function enableAudio() { player.muted = false; overlay.style.display = 'none'; }
+        
+        async function togglePiP() { 
+            try { 
                 if (document.pictureInPictureElement) { await document.exitPictureInPicture(); } 
-                else { await player.requestPictureInPicture(); }
-            } catch (error) { console.log("PiP error"); }
+                else { await player.requestPictureInPicture(); } 
+            } catch (e) { console.log("PiP error"); } 
         }
 
         function nextVideo() {
@@ -143,7 +147,7 @@
 
         function shareVideo() {
             if (navigator.share) {
-                navigator.share({ title: 'DEDALO TV', text: 'Watch Badret Live!', url: window.location.href });
+                navigator.share({ title: 'DEDALO TV', text: 'Watching Badret Live', url: window.location.href });
             }
         }
 
@@ -152,8 +156,6 @@
             icon.innerText = (icon.innerText === "♡") ? "♥" : "♡";
             icon.style.color = (icon.innerText === "♥") ? "var(--neon)" : "#fff";
         }
-
-        function formatLikes(num) { return num >= 1000 ? (num/1000).toFixed(1) + 'k' : num; }
 
         player.onended = nextVideo;
         loadVideo(currentVideoIndex);
