@@ -3,76 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    
-    <meta property="og:title" content="DEDALO TV | BADRET LIVE">
-    <meta property="og:type" content="video.other">
-    <meta property="og:video" content="https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/Red%20Think%20-%20Badret%20-%20Official%20video.mp4">
-    <meta property="og:video:type" content="video/mp4">
-    <meta property="og:image" content="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png">
-
     <title>DEDALO TV</title>
     <style>
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        
-        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; overflow-x: hidden; min-height: 100vh; }
-        
+        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; min-height: 100vh; }
         .wrapper { width: 100%; max-width: 420px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
         header { text-align: center; margin-bottom: 25px; width: 100%; }
         .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
         .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
 
-        /* Video Container */
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; }
         
-        /* TASTO UNMUTE IN BASSO A DESTRA */
+        /* TASTO UNMUTE - VERSIONE AGGIORNATA */
         #unmuteBtn { 
             position: absolute; 
-            bottom: 15px; 
-            right: 15px; 
-            background: rgba(0, 0, 0, 0.6); 
-            backdrop-filter: blur(5px);
+            bottom: 12px; 
+            right: 12px; 
+            background: var(--neon); /* Rosa per essere sicuri che si veda il cambio */
             color: #fff; 
-            border: 1px solid rgba(255,255,255,0.2);
+            border: none;
             padding: 8px 12px; 
-            border-radius: 8px; 
+            border-radius: 6px; 
             font-size: 10px; 
+            font-weight: bold;
             text-transform: uppercase; 
             letter-spacing: 1px;
-            z-index: 30; 
+            z-index: 999; 
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(255,0,85,0.5);
         }
-        #unmuteBtn:active { transform: scale(0.9); background: var(--neon); }
 
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; }
         .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
         .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
 
-        /* Icon Menu */
         .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; }
         .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 60px; }
-        .icon-btn span { font-size: 20px; transition: 0.2s; }
+        .icon-btn span { font-size: 20px; }
         .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; letter-spacing: 1px; }
 
-        .icon-btn:active span { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
-
-        /* Form area */
         .form-box { width: 100%; margin-top: 25px; padding: 20px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; }
         .form-box h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--light-gray); margin-bottom: 15px; }
-        
         input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; font-size: 14px; }
-        input:focus { border-color: var(--neon); }
-        
-        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; }
 
-        footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; letter-spacing: 2px; width: 100%; }
+        footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; width: 100%; }
     </style>
 </head>
 <body>
@@ -83,14 +61,10 @@
         </header>
 
         <div class="video-container">
-            <button id="unmuteBtn" onclick="enableAudio()">
-                <span>🔇</span> UNMUTE
-            </button>
-
+            <button id="unmuteBtn" onclick="enableAudio()">🔇 TAP TO UNMUTE</button>
             <video id="dedaloPlayer" autoplay muted playsinline>
                 <source src="" type="video/mp4">
             </video>
-            
             <div class="info-bar">
                 <div class="now-playing">Direct Broadcast</div>
                 <div id="videoTitle" class="video-title">Tuning in...</div>
@@ -98,37 +72,21 @@
         </div>
 
         <div class="icon-bar">
-            <button class="icon-btn" onclick="toggleLike()">
-                <span id="likeIcon">♡</span>
-                <label id="likeLabel">2.4k</label>
-            </button>
-            <button class="icon-btn" onclick="prevVideo()">
-                <span>⏮</span>
-                <label>Back</label>
-            </button>
-            <button class="icon-btn" onclick="stopVideo()">
-                <span id="stopIcon">■</span>
-                <label id="stopLabel">Stop</label>
-            </button>
-            <button class="icon-btn" onclick="nextVideo()">
-                <span>⏭</span>
-                <label>Next</label>
-            </button>
-            <button class="icon-btn" onclick="shareVideo()">
-                <span>⎋</span>
-                <label>Share</label>
-            </button>
+            <button class="icon-btn" onclick="toggleLike()"><span id="likeIcon">♡</span><label id="likeLabel">2.4k</label></button>
+            <button class="icon-btn" onclick="prevVideo()"><span>⏮</span><label>Back</label></button>
+            <button class="icon-btn" onclick="stopVideo()"><span id="stopIcon">■</span><label id="stopLabel">Stop</label></button>
+            <button class="icon-btn" onclick="nextVideo()"><span>⏭</span><label>Next</label></button>
+            <button class="icon-btn" onclick="shareVideo()"><span>⎋</span><label>Share</label></button>
         </div>
 
         <div class="form-box">
-            <h3>Download Full Track</h3>
+            <h3>Download Track</h3>
             <form action="https://formspree.io/f/mnjokbww" method="POST">
                 <input type="text" name="nickname" placeholder="Nickname" required>
                 <input type="email" name="email" placeholder="Email Address" required>
                 <button type="submit" class="sub-btn">Download Now</button>
             </form>
         </div>
-
         <footer>DEDALO &copy; 2026</footer>
     </div>
 
@@ -142,44 +100,32 @@
         let currentVideoIndex = 0;
         let liked = false;
         const player = document.getElementById('dedaloPlayer');
-        const titleDisplay = document.getElementById('videoTitle');
         const unmuteBtn = document.getElementById('unmuteBtn');
-        const stopIcon = document.getElementById('stopIcon');
-        const stopLabel = document.getElementById('stopLabel');
 
         function loadVideo(index) {
             const video = playlist[index];
-            player.src = R2_URL + encodeURIComponent(video.file);
-            titleDisplay.innerText = video.title;
+            // Aggiungo ?v=2 alla fine dell'URL per forzare lo svuotamento cache del video
+            player.src = R2_URL + encodeURIComponent(video.file) + "?v=2";
+            document.getElementById('videoTitle').innerText = video.title;
             
-            // Gestione Like Salvati
-            const baseLikes = video.likes;
-            const currentLikes = parseInt(localStorage.getItem('likes_' + index)) || baseLikes;
+            const currentLikes = parseInt(localStorage.getItem('likes_' + index)) || video.likes;
             liked = localStorage.getItem('liked_' + index) === 'true';
             updateLikeDisplay(currentLikes);
             
             player.load();
-            player.play();
-            
-            stopIcon.innerText = "■";
-            stopLabel.innerText = "Stop";
+            player.play().catch(e => console.log("Autoplay blocked"));
         }
 
         function enableAudio() { 
             player.muted = false; 
             unmuteBtn.style.display = 'none'; 
         }
-        
+
         function stopVideo() {
-            if (player.paused) {
-                player.play();
-                stopIcon.innerText = "■";
-                stopLabel.innerText = "Stop";
-            } else {
-                player.pause();
-                stopIcon.innerText = "▶";
-                stopLabel.innerText = "Play";
-            }
+            const btn = document.getElementById('stopIcon');
+            const lbl = document.getElementById('stopLabel');
+            if (player.paused) { player.play(); btn.innerText = "■"; lbl.innerText = "Stop"; }
+            else { player.pause(); btn.innerText = "▶"; lbl.innerText = "Play"; }
         }
 
         function nextVideo() { currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
@@ -188,14 +134,8 @@
         function toggleLike() {
             const index = currentVideoIndex;
             let currentLikes = parseInt(localStorage.getItem('likes_' + index)) || playlist[index].likes;
-            
-            if (!liked) {
-                liked = true; currentLikes++;
-                localStorage.setItem('liked_' + index, 'true');
-            } else {
-                liked = false; currentLikes--;
-                localStorage.setItem('liked_' + index, 'false');
-            }
+            if (!liked) { liked = true; currentLikes++; localStorage.setItem('liked_' + index, 'true'); }
+            else { liked = false; currentLikes--; localStorage.setItem('liked_' + index, 'false'); }
             localStorage.setItem('likes_' + index, currentLikes);
             updateLikeDisplay(currentLikes);
         }
@@ -209,11 +149,7 @@
             label.style.color = liked ? "var(--neon)" : "var(--light-gray)";
         }
 
-        function shareVideo() {
-            if (navigator.share) {
-                navigator.share({ title: 'DEDALO TV', text: 'Watch Badret Live', url: window.location.href });
-            }
-        }
+        function shareVideo() { if (navigator.share) { navigator.share({ title: 'DEDALO TV', url: window.location.href }); } }
 
         player.onended = nextVideo;
         loadVideo(currentVideoIndex);
