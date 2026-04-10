@@ -1,12 +1,23 @@
+Ricevuto. Torniamo a una struttura più solida e controllata. Ho eliminato Cusdis e il PiP, ripristinato il form di raccolta dati con Formspree (Nickname ed Email) e potenziato il player con i tasti **Back**, **Stop** e **Forward**.
+Inoltre, ho implementato il sistema dei **Like "truccati"**: partono da una base alta (es. 2.4k) e aumentano di uno (diventando rosa) quando l'utente clicca.
+### Codice Aggiornato index.html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    
+    <meta property="og:title" content="DEDALO TV | BADRET">
+    <meta property="og:type" content="video.other">
+    <meta property="og:video" content="https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/Red%20Think%20-%20Badret%20-%20Official%20video.mp4">
+    <meta property="og:video:type" content="video/mp4">
+    <meta property="og:image" content="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png">
+
     <title>DEDALO TV</title>
     <style>
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; margin: 0; display: flex; justify-content: center; }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; margin: 0; display: flex; justify-content: center; overflow-x: hidden; }
         .wrapper { width: 100%; max-width: 420px; padding: 15px; box-sizing: border-box; }
         
         header { text-align: center; margin-bottom: 25px; }
@@ -24,19 +35,18 @@
         .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
         .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
 
-        /* Icon Menu Minimal - POSIZIONE CORRETTA */
+        /* Icon Menu Minimal */
         .icon-bar { display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; }
-        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
-        .icon-btn span { font-size: 18px; }
-        .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; letter-spacing: 1px; }
-
-        /* CUSDIS MINIMALE - NO SCROLL */
-        #cusdis_thread { 
-            margin-top: 20px; 
-            min-height: 200px;
-            /* Forza Cusdis a non creare barre di scorrimento nel contenitore */
-            overflow: hidden !important; 
-        }
+        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; transition: 0.3s; }
+        .icon-btn span { font-size: 20px; }
+        .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+        
+        /* Form Box */
+        .form-box { margin-top: 25px; padding: 20px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; }
+        .form-box h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--light-gray); margin-bottom: 15px; }
+        input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; box-sizing: border-box; font-size: 14px; outline: none; }
+        input:focus { border-color: var(--neon); }
+        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; margin-top: 5px; }
 
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
         footer { padding: 40px 0; text-align: center; opacity: 0.2; font-size: 10px; letter-spacing: 2px; }
@@ -65,11 +75,15 @@
         <div class="icon-bar">
             <button class="icon-btn" onclick="toggleLike()">
                 <span id="likeIcon">♡</span>
-                <label id="likeCount">2.4k</label>
+                <label id="likeLabel">2.4k</label>
             </button>
-            <button class="icon-btn" onclick="togglePiP()">
-                <span>🔲</span>
-                <label>PiP</label>
+            <button class="icon-btn" onclick="prevVideo()">
+                <span>⏮</span>
+                <label>Back</label>
+            </button>
+            <button class="icon-btn" onclick="stopVideo()">
+                <span id="stopIcon">■</span>
+                <label id="stopLabel">Stop</label>
             </button>
             <button class="icon-btn" onclick="nextVideo()">
                 <span>⏭</span>
@@ -81,28 +95,19 @@
             </button>
         </div>
 
-        <div id="cusdis_thread"
-          data-host="https://cusdis.com"
-          data-app-id="6437d965-223f-445e-9d54-bc1ccc389ad9"
-          data-page-id="dedalo_tv_main"
-          data-page-url="https://rontinigrafico.github.io/Dedalo-tv/"
-          data-page-title="Dedalo TV"
-          data-theme="dark">
+        <div class="form-box">
+            <h3>Download Track</h3>
+            <form action="https://formspree.io/f/mnjokbww" method="POST">
+                <input type="text" name="nickname" placeholder="Nickname" required>
+                <input type="email" name="email" placeholder="Email Address" required>
+                <button type="submit" class="sub-btn">Download Now</button>
+            </form>
         </div>
 
         <footer>DEDALO &copy; 2026</footer>
     </div>
 
-    <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-
     <script>
-        // API CUSDIS per forzare il tema e pulire la grafica una volta caricato
-        window.onload = function() {
-            if (window.CUSDIS) {
-                window.CUSDIS.setTheme('dark');
-            }
-        };
-
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
         const playlist = [
             { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think", likes: 2405 },
@@ -110,43 +115,85 @@
         ];
 
         let currentVideoIndex = 0;
+        let liked = false;
         const player = document.getElementById('dedaloPlayer');
         const titleDisplay = document.getElementById('videoTitle');
         const overlay = document.getElementById('audioOverlay');
+        const stopIcon = document.getElementById('stopIcon');
+        const stopLabel = document.getElementById('stopLabel');
 
         function loadVideo(index) {
             const video = playlist[index];
             player.src = R2_URL + encodeURIComponent(video.file);
             titleDisplay.innerText = video.title;
-            document.getElementById('likeCount').innerText = video.likes >= 1000 ? (video.likes/1000).toFixed(1) + 'k' : video.likes;
+            updateLikeDisplay(video.likes);
             player.load();
             player.play();
+            stopIcon.innerText = "■";
+            stopLabel.innerText = "Stop";
         }
 
         function enableAudio() { player.muted = false; overlay.style.display = 'none'; }
         
-        async function togglePiP() { 
-            try { 
-                if (document.pictureInPictureElement) { await document.exitPictureInPicture(); } 
-                else { await player.requestPictureInPicture(); } 
-            } catch (e) {} 
+        function stopVideo() {
+            if (player.paused) {
+                player.play();
+                stopIcon.innerText = "■";
+                stopLabel.innerText = "Stop";
+            } else {
+                player.pause();
+                stopIcon.innerText = "▶";
+                stopLabel.innerText = "Play";
+            }
         }
 
         function nextVideo() {
             currentVideoIndex = (currentVideoIndex + 1) % playlist.length;
+            liked = false;
             loadVideo(currentVideoIndex);
         }
 
-        function shareVideo() {
-            if (navigator.share) {
-                navigator.share({ title: 'DEDALO TV', text: 'Watching Badret Live', url: window.location.href });
-            }
+        function prevVideo() {
+            currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length;
+            liked = false;
+            loadVideo(currentVideoIndex);
         }
 
         function toggleLike() {
             const icon = document.getElementById('likeIcon');
-            icon.innerText = (icon.innerText === "♡") ? "♥" : "♡";
-            icon.style.color = (icon.innerText === "♥") ? "var(--neon)" : "#fff";
+            const label = document.getElementById('likeLabel');
+            const baseLikes = playlist[currentVideoIndex].likes;
+
+            if (!liked) {
+                liked = true;
+                icon.innerText = "♥";
+                icon.style.color = "var(--neon)";
+                label.innerText = formatLikes(baseLikes + 1);
+                label.style.color = "var(--neon)";
+            } else {
+                liked = false;
+                icon.innerText = "♡";
+                icon.style.color = "#fff";
+                label.innerText = formatLikes(baseLikes);
+                label.style.color = "var(--light-gray)";
+            }
+        }
+
+        function updateLikeDisplay(count) {
+            const icon = document.getElementById('likeIcon');
+            const label = document.getElementById('likeLabel');
+            icon.innerText = "♡";
+            icon.style.color = "#fff";
+            label.innerText = formatLikes(count);
+            label.style.color = "var(--light-gray)";
+        }
+
+        function formatLikes(num) { return num >= 1000 ? (num/1000).toFixed(1) + 'k' : num; }
+
+        function shareVideo() {
+            if (navigator.share) {
+                navigator.share({ title: 'DEDALO TV', text: 'Watch Badret Live', url: window.location.href });
+            }
         }
 
         player.onended = nextVideo;
@@ -154,3 +201,14 @@
     </script>
 </body>
 </html>
+
+```
+### Novità inserite:
+ 1. **Tasto Stop/Play Centrale:** Il quadratino ferma il video e si trasforma in un triangolo "Play" se premuto di nuovo.
+ 2. **Tasti Back & Forward:** Ora puoi scorrere la playlist in entrambe le direzioni.
+ 3. **Like Smart:**
+   * Il conteggio è dinamico: se clicchi il cuore, il numero aumenta di 1 (es. 2.4k -> 2.4k+1) e diventa rosa.
+   * Se cambi video, il like si resetta per il nuovo brano (partendo dalla sua base).
+ 4. **Formspree Integrato:** Ho rimesso il modulo con Nickname ed Email collegato al tuo endpoint mnjokbww.
+ 5. **Niente PiP:** Interfaccia più pulita e focalizzata sul contenuto.
+Fai il commit di questo codice e Badret sarà di nuovo pronto per la raccolta contatti con una dashboard di controllo video completa!
