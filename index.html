@@ -15,45 +15,45 @@
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
         
         body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; margin: 0; display: flex; justify-content: center; }
-        .wrapper { width: 100%; max-width: 420px; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; }
+        .wrapper { width: 100%; max-width: 420px; padding: 15px; box-sizing: border-box; }
         
         header { text-align: center; margin-bottom: 25px; }
         .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
         .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
 
-        /* Video Player Area */
+        /* Video Area */
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; }
         video { width: 100%; aspect-ratio: 16/9; display: block; }
         
-        #audioOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 20; cursor: pointer; }
+        #audioOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 20; cursor: pointer; }
         .audio-icon { font-size: 35px; color: var(--neon); animation: pulse 1.5s infinite; }
 
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; }
         .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
-        .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; letter-spacing: -0.2px; }
+        .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
 
-        /* Icon Menu Minimal - Spostato SOTTO i commenti */
-        .icon-bar { display: flex; justify-content: space-around; padding: 20px 0; order: 3; border-top: 1px solid #111; }
+        /* Icon Menu Minimal - SOTTO IL VIDEO */
+        .icon-bar { display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; }
         .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .icon-btn span { font-size: 18px; }
         .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Cusdis Integration - Spostato SOPRA (order 2) */
-        #comment-wrapper { order: 2; margin: 20px 0; }
+        /* Cusdis Integration - CORRETTA E SENZA SCROLL */
         #cusdis_thread { 
-            background: transparent !important; 
-            min-height: 150px;
+            width: 100% !important;
+            margin-top: 10px;
+            background: transparent !important;
         }
 
-        /* Hack per forzare colori Cusdis (Rosa per i nomi) */
+        /* Forza la rimozione dello scroll dall'iframe tramite contenitore */
         #cusdis_thread iframe { 
-            color-scheme: dark; 
-            filter: contrast(1.1) brightness(1.1); 
+            width: 100% !important; 
+            border: none !important;
+            overflow: hidden !important;
         }
 
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
-        
-        footer { order: 4; padding: 40px 0; text-align: center; opacity: 0.2; font-size: 10px; letter-spacing: 2px; }
+        footer { padding: 40px 0; text-align: center; opacity: 0.2; font-size: 10px; letter-spacing: 2px; }
     </style>
 </head>
 <body>
@@ -76,17 +76,6 @@
             </div>
         </div>
 
-        <div id="comment-wrapper">
-            <div id="cusdis_thread"
-              data-host="https://cusdis.com"
-              data-app-id="6437d965-223f-445e-9d54-bc1ccc389ad9"
-              data-page-id="dedalo_tv_main"
-              data-page-url="https://rontinigrafico.github.io/Dedalo-tv/"
-              data-page-title="Dedalo TV"
-              data-theme="dark">
-            </div>
-        </div>
-
         <div class="icon-bar">
             <button class="icon-btn" onclick="toggleLike()">
                 <span id="likeIcon">♡</span>
@@ -94,16 +83,25 @@
             </button>
             <button class="icon-btn" onclick="togglePiP()">
                 <span>🔲</span>
-                <label>PiP Mode</label>
+                <label>PiP</label>
             </button>
             <button class="icon-btn" onclick="nextVideo()">
                 <span>⏭</span>
-                <label>Next Track</label>
+                <label>Next</label>
             </button>
             <button class="icon-btn" onclick="shareVideo()">
                 <span>⎋</span>
                 <label>Share</label>
             </button>
+        </div>
+
+        <div id="cusdis_thread"
+          data-host="https://cusdis.com"
+          data-app-id="6437d965-223f-445e-9d54-bc1ccc389ad9"
+          data-page-id="dedalo_tv_main"
+          data-page-url="https://rontinigrafico.github.io/Dedalo-tv/"
+          data-page-title="Dedalo TV"
+          data-theme="dark">
         </div>
 
         <footer>DEDALO &copy; 2026</footer>
