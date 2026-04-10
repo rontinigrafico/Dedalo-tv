@@ -5,85 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     
     <meta property="og:title" content="DEDALO TV | BADRET LIVE">
-    <meta property="og:description" content="Watch Badret's exclusive Virtual Production set.">
     <meta property="og:type" content="video.other">
-    <meta property="og:url" content="https://rontinigrafico.github.io/Dedalo-tv/">
     <meta property="og:video" content="https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/Red%20Think%20-%20Badret%20-%20Official%20video.mp4">
-    <meta property="og:video:secure_url" content="https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/Red%20Think%20-%20Badret%20-%20Official%20video.mp4">
     <meta property="og:video:type" content="video/mp4">
-    <meta property="og:video:width" content="1280">
-    <meta property="og:video:height" content="720">
     <meta property="og:image" content="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png">
-    <meta name="twitter:card" content="player">
-    <meta name="twitter:player" content="https://rontinigrafico.github.io/Dedalo-tv/">
 
     <title>DEDALO TV</title>
     <style>
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
         
-        /* Reset totale per impedire testi spuri */
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; overflow-x: hidden; min-height: 100vh; }
         
         .wrapper { width: 100%; max-width: 420px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
-        /* Header */
-        header { text-align: center; margin-bottom: 25px; width: 100%; display: flex; flex-direction: column; align-items: center; }
-        .logo-img { width: 140px; height: auto; display: block; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
-        .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; font-weight: 300; }
+        header { text-align: center; margin-bottom: 25px; width: 100%; }
+        .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
+        .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
 
-        /* Video Area */
+        /* Video Container */
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; background: #000; }
+        video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; }
         
-        /* Overlay Attiva Audio */
-        #audioOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 20; cursor: pointer; transition: 0.3s; }
-        .audio-icon { font-size: 35px; color: var(--neon); animation: pulse 1.5s infinite; }
+        /* TASTO UNMUTE IN BASSO A DESTRA */
+        #unmuteBtn { 
+            position: absolute; 
+            bottom: 15px; 
+            right: 15px; 
+            background: rgba(0, 0, 0, 0.6); 
+            backdrop-filter: blur(5px);
+            color: #fff; 
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            z-index: 30; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s;
+        }
+        #unmuteBtn:active { transform: scale(0.9); background: var(--neon); }
 
-        /* Info Bar */
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; }
-        .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; color: #fff; }
+        .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
+        .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
 
-        /* Icon Menu Minimal */
-        .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; background: var(--bg); }
-        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); outline: none; width: 60px; }
-        
-        .icon-btn span { font-size: 20px; display: block; line-height: 1; transition: 0.2s; }
-        .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; display: block; }
+        /* Icon Menu */
+        .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; }
+        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 60px; }
+        .icon-btn span { font-size: 20px; transition: 0.2s; }
+        .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Effetti al click/active */
-        .icon-btn:active span { transform: scale(0.9); text-shadow: 0 0 15px var(--neon); color: var(--neon); }
+        .icon-btn:active span { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
 
         /* Form area */
         .form-box { width: 100%; margin-top: 25px; padding: 20px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; }
-        .form-box h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--light-gray); margin-bottom: 15px; font-weight: bold; }
+        .form-box h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--light-gray); margin-bottom: 15px; }
         
-        input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; font-size: 14px; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--neon); background: #050505; }
+        input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; font-size: 14px; }
+        input:focus { border-color: var(--neon); }
         
-        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; transition: 0.2s; box-shadow: 0 4px 15px rgba(255,0,85,0.2); }
-        .sub-btn:active { transform: translateY(1px); box-shadow: 0 2px 5px rgba(255,0,85,0.2); opacity: 0.9; }
+        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
 
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
-        
-        footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; letter-spacing: 2px; color: #fff; text-transform: uppercase; width: 100%; }
+        footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; letter-spacing: 2px; width: 100%; }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <header>
-            <div style="display:inline-block;">
-                <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" alt="DEDALO LOGO" class="logo-img">
-            </div>
+            <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" alt="DEDALO LOGO" class="logo-img">
             <div class="brand">Music Distribution</div>
         </header>
 
         <div class="video-container">
-            <div id="audioOverlay" onclick="enableAudio()">
-                <div class="audio-icon">🔊</div>
-            </div>
+            <button id="unmuteBtn" onclick="enableAudio()">
+                <span>🔇</span> UNMUTE
+            </button>
 
             <video id="dedaloPlayer" autoplay muted playsinline>
                 <source src="" type="video/mp4">
@@ -141,7 +143,7 @@
         let liked = false;
         const player = document.getElementById('dedaloPlayer');
         const titleDisplay = document.getElementById('videoTitle');
-        const overlay = document.getElementById('audioOverlay');
+        const unmuteBtn = document.getElementById('unmuteBtn');
         const stopIcon = document.getElementById('stopIcon');
         const stopLabel = document.getElementById('stopLabel');
 
@@ -150,10 +152,10 @@
             player.src = R2_URL + encodeURIComponent(video.file);
             titleDisplay.innerText = video.title;
             
-            // Carica i Like salvati per quel video
+            // Gestione Like Salvati
             const baseLikes = video.likes;
-            const currentLikes = getStoredLikes(index) || baseLikes;
-            liked = getStoredLikedStatus(index);
+            const currentLikes = parseInt(localStorage.getItem('likes_' + index)) || baseLikes;
+            liked = localStorage.getItem('liked_' + index) === 'true';
             updateLikeDisplay(currentLikes);
             
             player.load();
@@ -163,7 +165,10 @@
             stopLabel.innerText = "Stop";
         }
 
-        function enableAudio() { player.muted = false; overlay.style.display = 'none'; }
+        function enableAudio() { 
+            player.muted = false; 
+            unmuteBtn.style.display = 'none'; 
+        }
         
         function stopVideo() {
             if (player.paused) {
@@ -180,23 +185,18 @@
         function nextVideo() { currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
         function prevVideo() { currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; loadVideo(currentVideoIndex); }
 
-        // Gestione Like dinamica e salvata localmente
         function toggleLike() {
             const index = currentVideoIndex;
-            const video = playlist[index];
-            let currentLikes = getStoredLikes(index) || video.likes;
+            let currentLikes = parseInt(localStorage.getItem('likes_' + index)) || playlist[index].likes;
             
             if (!liked) {
-                liked = true;
-                currentLikes++;
-                setStoredLikedStatus(index, true);
+                liked = true; currentLikes++;
+                localStorage.setItem('liked_' + index, 'true');
             } else {
-                liked = false;
-                currentLikes--;
-                setStoredLikedStatus(index, false);
+                liked = false; currentLikes--;
+                localStorage.setItem('liked_' + index, 'false');
             }
-            
-            setStoredLikes(index, currentLikes);
+            localStorage.setItem('likes_' + index, currentLikes);
             updateLikeDisplay(currentLikes);
         }
 
@@ -205,21 +205,13 @@
             const label = document.getElementById('likeLabel');
             icon.innerText = liked ? "♥" : "♡";
             icon.style.color = liked ? "var(--neon)" : "#fff";
-            label.innerText = formatLikes(count);
+            label.innerText = count >= 1000 ? (count/1000).toFixed(1) + 'k' : count;
             label.style.color = liked ? "var(--neon)" : "var(--light-gray)";
         }
 
-        function formatLikes(num) { return num >= 1000 ? (num/1000).toFixed(1) + 'k' : num; }
-
-        // LocalStorage Helpers per i Like
-        function getStoredLikes(index) { return parseInt(localStorage.getItem('likes_' + index)); }
-        function setStoredLikes(index, count) { localStorage.setItem('likes_' + index, count); }
-        function getStoredLikedStatus(index) { return localStorage.getItem('liked_' + index) === 'true'; }
-        function setStoredLikedStatus(index, status) { localStorage.setItem('liked_' + index, status); }
-
         function shareVideo() {
             if (navigator.share) {
-                navigator.share({ title: 'DEDALO TV', text: 'Watching Badret Live', url: window.location.href });
+                navigator.share({ title: 'DEDALO TV', text: 'Watch Badret Live', url: window.location.href });
             }
         }
 
