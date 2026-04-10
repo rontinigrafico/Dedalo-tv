@@ -26,7 +26,7 @@
         #audioOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 20; cursor: pointer; }
         .audio-icon { font-size: 40px; color: var(--neon); animation: pulse 1.5s infinite; }
 
-        .info-bar { padding: 15px; background: var(--panel); }
+        .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; }
         .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
 
@@ -35,17 +35,15 @@
         .icon-btn span { font-size: 20px; }
         .icon-btn label { font-size: 9px; color: var(--gray); text-transform: uppercase; }
 
-        /* Comments Feed (Social Proof) */
-        .comments-feed { margin-top: 30px; padding: 0 5px; }
-        .comment-card { margin-bottom: 20px; border-left: 2px solid #222; padding-left: 15px; }
-        .user-nick { color: var(--neon); font-weight: bold; font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 3px; }
-        .user-text { color: #ccc; font-size: 13px; line-height: 1.4; }
-
-        /* Form area */
-        .form-box { margin-top: 10px; padding: 20px; background: var(--panel); border-radius: 15px; border: 1px solid #111; }
-        input, textarea { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; box-sizing: border-box; font-size: 14px; outline: none; }
-        input:focus, textarea:focus { border-color: var(--neon); }
-        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        /* Cusdis Custom Theme */
+        #cusdis_thread { 
+            margin-top: 30px; 
+            padding: 10px; 
+            background: var(--panel); 
+            border-radius: 15px; 
+            border: 1px solid #111; 
+            min-height: 200px;
+        }
 
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
     </style>
@@ -89,26 +87,20 @@
             </button>
         </div>
 
-        <div class="comments-feed">
-            <div class="comment-card">
-                <span class="user-nick">@VIRTUAL_FAN</span>
-                <span class="user-text">This Virtual Production is insane. Best visuals of 2024.</span>
-            </div>
-            <div class="comment-card">
-                <span class="user-nick">@AUDIO_MAESTRO</span>
-                <span class="user-text">The mix is so clean. Badret never misses!</span>
-            </div>
+        <div id="cusdis_thread"
+          data-host="https://cusdis.com"
+          data-app-id="6437d965-223f-445e-9d54-bc1ccc389ad9"
+          data-page-id="dedalo_tv_main"
+          data-page-url="https://rontinigrafico.github.io/Dedalo-tv/"
+          data-page-title="Dedalo TV"
+          data-theme="dark">
         </div>
+        <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
 
-        <div class="form-box">
-            <form action="https://formspree.io/f/mnjokbww" method="POST">
-                <input type="text" name="nickname" placeholder="Nickname" required>
-                <input type="email" name="_replyto" placeholder="Your Email" required>
-                <textarea name="message" rows="3" placeholder="Write a comment..." required></textarea>
-                <input type="hidden" name="_subject" value="New Comment from Dedalo TV">
-                <button type="submit" class="sub-btn">Comment and Download</button>
-            </form>
-        </div>
+        <footer style="margin-top: 50px; text-align: center; opacity: 0.2; font-size: 10px; padding-bottom: 40px;">
+            DEDALO DISTRIBUTION &copy; 2026<br>
+            Powered by GitHub & Cloudflare R2
+        </footer>
     </div>
 
     <script>
@@ -141,7 +133,7 @@
             try {
                 if (document.pictureInPictureElement) { await document.exitPictureInPicture(); } 
                 else { await player.requestPictureInPicture(); }
-            } catch (error) { console.log("PiP not supported"); }
+            } catch (error) { console.log("PiP error"); }
         }
 
         function nextVideo() {
