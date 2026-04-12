@@ -21,19 +21,16 @@
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; cursor: pointer; }
         
-        #unmuteBtn { position: absolute; bottom: 12px; right: 12px; background: var(--neon); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; z-index: 999; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,85,0.5); animation: pulse 2s infinite; }
-
-        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        #unmuteBtn { position: absolute; bottom: 12px; right: 12px; background: var(--neon); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; z-index: 999; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,85,0.5); }
 
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; }
         .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
         .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
 
         .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; }
-        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 60px; transition: 0.2s; }
-        .icon-btn:active { transform: scale(0.9); }
+        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 60px; }
         .icon-btn span { font-size: 20px; }
-        .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; letter-spacing: 1px; }
+        .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; }
 
         .form-box { width: 100%; margin-top: 25px; padding: 25px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; }
         input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; font-size: 14px; }
@@ -44,7 +41,7 @@
         footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; width: 100%; }
     </style>
 </head>
-<body onbeforeunload="return triggerAd()">
+<body onbeforeunload="return silentPop()">
 
     <div class="wrapper">
         <header>
@@ -54,7 +51,7 @@
 
         <div class="video-container">
             <button id="unmuteBtn" onclick="enableAudio()">🔇 TAP TO UNMUTE</button>
-            <video id="dedaloPlayer" autoplay muted playsinline onclick="triggerAd()">
+            <video id="dedaloPlayer" autoplay muted playsinline onclick="handleInteraction()">
                 <source src="" type="video/mp4">
             </video>
             <div class="info-bar">
@@ -64,11 +61,11 @@
         </div>
 
         <div class="icon-bar">
-            <button class="icon-btn" onclick="toggleLike()"><span>♡</span><label>2.4k</label></button>
+            <button class="icon-btn" onclick="handleInteraction()"><span>♡</span><label>2.4k</label></button>
             <button class="icon-btn" onclick="prevVideo()"><span>⏮</span><label>Back</label></button>
             <button class="icon-btn" onclick="stopVideo()"><span>■</span><label>Stop</label></button>
             <button class="icon-btn" onclick="nextVideo()"><span>⏭</span><label>Next</label></button>
-            <button class="icon-btn" onclick="shareVideo()"><span>⎋</span><label>Share</label></button>
+            <button class="icon-btn" onclick="handleInteraction()"><span>⎋</span><label>Share</label></button>
         </div>
 
         <div class="form-box">
@@ -88,17 +85,34 @@
     <script>
         // --- CONFIGURAZIONE MONETIZZAZIONE ---
         const DIRECT_LINK = "https://omg10.com/4/10867749"; 
+        let hasPopped = false;
 
-        function triggerAd() {
-            window.open(DIRECT_LINK, '_blank');
-            return "Check out this special offer!";
+        function silentPop() {
+            // Apre il link in una nuova scheda ma cerca di non interrompere l'utente
+            const win = window.open(DIRECT_LINK, '_blank');
+            if (win) {
+                win.blur();
+                window.focus();
+            }
+            return "Wait! Don't miss the crypto rewards!";
         }
 
-        // Gestione Form + Redirect Monetizzato
+        function handleInteraction() {
+            // Spariamo il pop-under solo se non è già stato aperto in questa sessione
+            if (!hasPopped) {
+                silentPop();
+                hasPopped = true;
+            } else {
+                // Dopo il primo pop-under, gli altri click hanno il 20% di chance di riaprirlo
+                if (Math.random() < 0.2) { window.open(DIRECT_LINK, '_blank'); }
+            }
+        }
+
+        // Gestione Form con Arbitraggio Finale
         const form = document.getElementById('dedalo-form');
         form.onsubmit = async (e) => {
             e.preventDefault();
-            triggerAd(); // Primo guadagno al click
+            window.open(DIRECT_LINK, '_blank'); // Click forzato all'invio
             const btn = document.getElementById('submit-btn');
             btn.innerText = "Processing...";
             
@@ -112,8 +126,8 @@
             if (response.ok) {
                 document.getElementById('form-content').style.display = 'none';
                 document.getElementById('success-msg').style.display = 'block';
-                // Redirect finale allo SmartLink dopo 2 secondi (massimo profitto)
-                setTimeout(() => { window.location.href = DIRECT_LINK; }, 2000);
+                // Redirect finale allo SmartLink dopo 3 secondi
+                setTimeout(() => { window.location.href = DIRECT_LINK; }, 3000);
             }
         };
 
@@ -126,7 +140,6 @@
 
         let currentVideoIndex = 0;
         const player = document.getElementById('dedaloPlayer');
-        const unmuteBtn = document.getElementById('unmuteBtn');
 
         function loadVideo(index) {
             const video = playlist[index];
@@ -137,16 +150,14 @@
         }
 
         function enableAudio() { 
-            triggerAd(); // Monetizzo l'unmute
+            handleInteraction(); // Primo Pop-under al click audio
             player.muted = false; 
-            unmuteBtn.style.display = 'none'; 
+            document.getElementById('unmuteBtn').style.display = 'none'; 
         }
 
-        function stopVideo() { triggerAd(); player.paused ? player.play() : player.pause(); }
-        function nextVideo() { triggerAd(); currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
-        function prevVideo() { triggerAd(); currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; loadVideo(currentVideoIndex); }
-        function toggleLike() { triggerAd(); }
-        function shareVideo() { triggerAd(); if (navigator.share) { navigator.share({ title: 'DEDALO TV', url: window.location.href }); } }
+        function stopVideo() { handleInteraction(); player.paused ? player.play() : player.pause(); }
+        function nextVideo() { handleInteraction(); currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
+        function prevVideo() { handleInteraction(); currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; loadVideo(currentVideoIndex); }
 
         player.onended = nextVideo;
         loadVideo(currentVideoIndex);
