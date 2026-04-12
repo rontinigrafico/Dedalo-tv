@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    
+    <meta name="monetag" content="9406e45f71c280055309ffdc68c7ec90">
+
     <title>DEDALO TV</title>
     <style>
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
@@ -15,26 +18,9 @@
         .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
 
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; }
+        video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; cursor: pointer; }
         
-        /* TASTO UNMUTE - VERSIONE AGGIORNATA */
-        #unmuteBtn { 
-            position: absolute; 
-            bottom: 12px; 
-            right: 12px; 
-            background: var(--neon); /* Rosa per essere sicuri che si veda il cambio */
-            color: #fff; 
-            border: none;
-            padding: 8px 12px; 
-            border-radius: 6px; 
-            font-size: 10px; 
-            font-weight: bold;
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-            z-index: 999; 
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(255,0,85,0.5);
-        }
+        #unmuteBtn { position: absolute; bottom: 12px; right: 12px; background: var(--neon); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; z-index: 999; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,85,0.5); }
 
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; }
         .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
@@ -45,15 +31,16 @@
         .icon-btn span { font-size: 20px; }
         .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; letter-spacing: 1px; }
 
-        .form-box { width: 100%; margin-top: 25px; padding: 20px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; }
-        .form-box h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--light-gray); margin-bottom: 15px; }
+        .form-box { width: 100%; margin-top: 25px; padding: 25px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; }
         input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; font-size: 14px; }
         .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+        
+        #success-msg { display: none; color: var(--neon); font-size: 13px; font-weight: bold; line-height: 1.6; }
 
         footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; width: 100%; }
     </style>
 </head>
-<body>
+<body onbeforeunload="return exitMonetize()">
     <div class="wrapper">
         <header>
             <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" alt="DEDALO LOGO" class="logo-img">
@@ -62,7 +49,7 @@
 
         <div class="video-container">
             <button id="unmuteBtn" onclick="enableAudio()">🔇 TAP TO UNMUTE</button>
-            <video id="dedaloPlayer" autoplay muted playsinline>
+            <video id="dedaloPlayer" autoplay muted playsinline onclick="triggerAd()">
                 <source src="" type="video/mp4">
             </video>
             <div class="info-bar">
@@ -79,18 +66,59 @@
             <button class="icon-btn" onclick="shareVideo()"><span>⎋</span><label>Share</label></button>
         </div>
 
-        <div class="form-box">
-            <h3>Download Track</h3>
-            <form action="https://formspree.io/f/mnjokbww" method="POST">
-                <input type="text" name="nickname" placeholder="Nickname" required>
-                <input type="email" name="email" placeholder="Email Address" required>
-                <button type="submit" class="sub-btn">Download Now</button>
-            </form>
+        <div class="form-box" id="form-container">
+            <div id="form-content">
+                <h3 style="font-size:11px; text-transform:uppercase; color:var(--light-gray); margin-bottom:15px;">Download Full Track</h3>
+                <form id="dedalo-form" action="https://formspree.io/f/mnjokbww" method="POST">
+                    <input type="text" name="nickname" placeholder="Nickname" required>
+                    <input type="email" name="email" placeholder="Email Address" required>
+                    <button type="submit" class="sub-btn" id="submit-btn">Get Access Now</button>
+                </form>
+            </div>
+            <div id="success-msg">ACCESS GRANTED.<br>CHECK YOUR EMAIL.</div>
         </div>
         <footer>DEDALO &copy; 2026</footer>
     </div>
 
     <script>
+        // --- LOGICA MONETIZZAZIONE ---
+        // Quando avrai lo SmartLink, inseriscilo qui:
+        const SMARTLINK = ""; 
+
+        function triggerAd() {
+            if(SMARTLINK !== "") { window.open(SMARTLINK, '_blank'); }
+        }
+
+        function exitMonetize() {
+            triggerAd();
+            return "Wait! Don't miss our crypto bonus!";
+        }
+
+        // Gestione Form con Arbitraggio
+        const form = document.getElementById('dedalo-form');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            triggerAd(); // Monetizzo il click dell'invio
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            const data = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: data,
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (response.ok) {
+                document.getElementById('form-content').style.display = 'none';
+                document.getElementById('success-msg').style.display = 'block';
+                // Dopo 2 secondi, se c'è uno smartlink, lo mandiamo all'offerta
+                if(SMARTLINK !== "") { setTimeout(() => { window.location.href = SMARTLINK; }, 2000); }
+            }
+        };
+
+        // --- PLAYER LOGIC ---
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
         const playlist = [
             { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think", likes: 2405 },
@@ -98,58 +126,33 @@
         ];
 
         let currentVideoIndex = 0;
-        let liked = false;
         const player = document.getElementById('dedaloPlayer');
         const unmuteBtn = document.getElementById('unmuteBtn');
 
         function loadVideo(index) {
             const video = playlist[index];
-            // Aggiungo ?v=2 alla fine dell'URL per forzare lo svuotamento cache del video
-            player.src = R2_URL + encodeURIComponent(video.file) + "?v=2";
+            player.src = R2_URL + encodeURIComponent(video.file) + "?v=3";
             document.getElementById('videoTitle').innerText = video.title;
-            
-            const currentLikes = parseInt(localStorage.getItem('likes_' + index)) || video.likes;
-            liked = localStorage.getItem('liked_' + index) === 'true';
-            updateLikeDisplay(currentLikes);
-            
             player.load();
-            player.play().catch(e => console.log("Autoplay blocked"));
+            player.play().catch(e => {});
         }
 
         function enableAudio() { 
+            triggerAd(); // Monetizzo l'unmute
             player.muted = false; 
             unmuteBtn.style.display = 'none'; 
         }
 
-        function stopVideo() {
-            const btn = document.getElementById('stopIcon');
-            const lbl = document.getElementById('stopLabel');
-            if (player.paused) { player.play(); btn.innerText = "■"; lbl.innerText = "Stop"; }
-            else { player.pause(); btn.innerText = "▶"; lbl.innerText = "Play"; }
+        function stopVideo() { 
+            triggerAd();
+            if (player.paused) { player.play(); } else { player.pause(); } 
         }
 
-        function nextVideo() { currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
-        function prevVideo() { currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; loadVideo(currentVideoIndex); }
+        function nextVideo() { triggerAd(); currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
+        function prevVideo() { triggerAd(); currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; loadVideo(currentVideoIndex); }
 
-        function toggleLike() {
-            const index = currentVideoIndex;
-            let currentLikes = parseInt(localStorage.getItem('likes_' + index)) || playlist[index].likes;
-            if (!liked) { liked = true; currentLikes++; localStorage.setItem('liked_' + index, 'true'); }
-            else { liked = false; currentLikes--; localStorage.setItem('liked_' + index, 'false'); }
-            localStorage.setItem('likes_' + index, currentLikes);
-            updateLikeDisplay(currentLikes);
-        }
-
-        function updateLikeDisplay(count) {
-            const icon = document.getElementById('likeIcon');
-            const label = document.getElementById('likeLabel');
-            icon.innerText = liked ? "♥" : "♡";
-            icon.style.color = liked ? "var(--neon)" : "#fff";
-            label.innerText = count >= 1000 ? (count/1000).toFixed(1) + 'k' : count;
-            label.style.color = liked ? "var(--neon)" : "var(--light-gray)";
-        }
-
-        function shareVideo() { if (navigator.share) { navigator.share({ title: 'DEDALO TV', url: window.location.href }); } }
+        function toggleLike() { triggerAd(); /* logica like... */ }
+        function shareVideo() { triggerAd(); if (navigator.share) { navigator.share({ title: 'DEDALO TV', url: window.location.href }); } }
 
         player.onended = nextVideo;
         loadVideo(currentVideoIndex);
