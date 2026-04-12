@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     
     <meta name="monetag" content="9406e45f71c280055309ffdc68c7ec90">
+    <script src="https://quge5.com/88/tag.min.js" data-zone="229076" async data-cfasync="false"></script>
 
     <title>DEDALO TV</title>
     <style>
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; min-height: 100vh; }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         .wrapper { width: 100%; max-width: 420px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
         header { text-align: center; margin-bottom: 25px; width: 100%; }
@@ -20,14 +21,17 @@
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; cursor: pointer; }
         
-        #unmuteBtn { position: absolute; bottom: 12px; right: 12px; background: var(--neon); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; z-index: 999; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,85,0.5); }
+        #unmuteBtn { position: absolute; bottom: 12px; right: 12px; background: var(--neon); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; z-index: 999; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,85,0.5); animation: pulse 2s infinite; }
+
+        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
 
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; }
         .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
         .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
 
         .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; }
-        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 60px; }
+        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 60px; transition: 0.2s; }
+        .icon-btn:active { transform: scale(0.9); }
         .icon-btn span { font-size: 20px; }
         .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; letter-spacing: 1px; }
 
@@ -40,7 +44,8 @@
         footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; width: 100%; }
     </style>
 </head>
-<body onbeforeunload="return exitMonetize()">
+<body onbeforeunload="return triggerAd()">
+
     <div class="wrapper">
         <header>
             <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" alt="DEDALO LOGO" class="logo-img">
@@ -59,50 +64,44 @@
         </div>
 
         <div class="icon-bar">
-            <button class="icon-btn" onclick="toggleLike()"><span id="likeIcon">♡</span><label id="likeLabel">2.4k</label></button>
+            <button class="icon-btn" onclick="toggleLike()"><span>♡</span><label>2.4k</label></button>
             <button class="icon-btn" onclick="prevVideo()"><span>⏮</span><label>Back</label></button>
-            <button class="icon-btn" onclick="stopVideo()"><span id="stopIcon">■</span><label id="stopLabel">Stop</label></button>
+            <button class="icon-btn" onclick="stopVideo()"><span>■</span><label>Stop</label></button>
             <button class="icon-btn" onclick="nextVideo()"><span>⏭</span><label>Next</label></button>
             <button class="icon-btn" onclick="shareVideo()"><span>⎋</span><label>Share</label></button>
         </div>
 
-        <div class="form-box" id="form-container">
+        <div class="form-box">
             <div id="form-content">
-                <h3 style="font-size:11px; text-transform:uppercase; color:var(--light-gray); margin-bottom:15px;">Download Full Track</h3>
+                <h3 style="font-size:11px; text-transform:uppercase; color:var(--light-gray); margin-bottom:15px;">Download HQ Pack</h3>
                 <form id="dedalo-form" action="https://formspree.io/f/mnjokbww" method="POST">
                     <input type="text" name="nickname" placeholder="Nickname" required>
                     <input type="email" name="email" placeholder="Email Address" required>
-                    <button type="submit" class="sub-btn" id="submit-btn">Get Access Now</button>
+                    <button type="submit" class="sub-btn" id="submit-btn">Unlock Download</button>
                 </form>
             </div>
-            <div id="success-msg">ACCESS GRANTED.<br>CHECK YOUR EMAIL.</div>
+            <div id="success-msg">ACCESS GRANTED.<br>CHECKING FOR CRYPTO REWARDS...</div>
         </div>
         <footer>DEDALO &copy; 2026</footer>
     </div>
 
     <script>
-        // --- LOGICA MONETIZZAZIONE ---
-        // Quando avrai lo SmartLink, inseriscilo qui:
-        const SMARTLINK = ""; 
+        // --- CONFIGURAZIONE MONETIZZAZIONE ---
+        const DIRECT_LINK = "https://omg10.com/4/10867749"; 
 
         function triggerAd() {
-            if(SMARTLINK !== "") { window.open(SMARTLINK, '_blank'); }
+            window.open(DIRECT_LINK, '_blank');
+            return "Check out this special offer!";
         }
 
-        function exitMonetize() {
-            triggerAd();
-            return "Wait! Don't miss our crypto bonus!";
-        }
-
-        // Gestione Form con Arbitraggio
+        // Gestione Form + Redirect Monetizzato
         const form = document.getElementById('dedalo-form');
         form.onsubmit = async (e) => {
             e.preventDefault();
-            triggerAd(); // Monetizzo il click dell'invio
+            triggerAd(); // Primo guadagno al click
             const btn = document.getElementById('submit-btn');
             btn.innerText = "Processing...";
-            btn.disabled = true;
-
+            
             const data = new FormData(form);
             const response = await fetch(form.action, {
                 method: 'POST',
@@ -113,16 +112,16 @@
             if (response.ok) {
                 document.getElementById('form-content').style.display = 'none';
                 document.getElementById('success-msg').style.display = 'block';
-                // Dopo 2 secondi, se c'è uno smartlink, lo mandiamo all'offerta
-                if(SMARTLINK !== "") { setTimeout(() => { window.location.href = SMARTLINK; }, 2000); }
+                // Redirect finale allo SmartLink dopo 2 secondi (massimo profitto)
+                setTimeout(() => { window.location.href = DIRECT_LINK; }, 2000);
             }
         };
 
         // --- PLAYER LOGIC ---
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
         const playlist = [
-            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think", likes: 2405 },
-            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage", likes: 1892 }
+            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think" },
+            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" }
         ];
 
         let currentVideoIndex = 0;
@@ -131,7 +130,7 @@
 
         function loadVideo(index) {
             const video = playlist[index];
-            player.src = R2_URL + encodeURIComponent(video.file) + "?v=3";
+            player.src = R2_URL + encodeURIComponent(video.file);
             document.getElementById('videoTitle').innerText = video.title;
             player.load();
             player.play().catch(e => {});
@@ -143,15 +142,10 @@
             unmuteBtn.style.display = 'none'; 
         }
 
-        function stopVideo() { 
-            triggerAd();
-            if (player.paused) { player.play(); } else { player.pause(); } 
-        }
-
+        function stopVideo() { triggerAd(); player.paused ? player.play() : player.pause(); }
         function nextVideo() { triggerAd(); currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
         function prevVideo() { triggerAd(); currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; loadVideo(currentVideoIndex); }
-
-        function toggleLike() { triggerAd(); /* logica like... */ }
+        function toggleLike() { triggerAd(); }
         function shareVideo() { triggerAd(); if (navigator.share) { navigator.share({ title: 'DEDALO TV', url: window.location.href }); } }
 
         player.onended = nextVideo;
