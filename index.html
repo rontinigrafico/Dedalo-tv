@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     
     <script type="text/javascript" src="//acp.adcash.com/script/aclib.js"></script>
+
     <script type="text/javascript">
         aclib.runAutoTag({
             zoneId: 'qqjauvswqt',
@@ -22,6 +23,7 @@
         .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
         .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
 
+        /* Container ottimizzato per Video Ads */
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; cursor: pointer; }
         
@@ -76,7 +78,7 @@
                 <form id="dedalo-form" action="https://formspree.io/f/mnjokbww" method="POST">
                     <input type="text" name="nickname" placeholder="Nickname" required>
                     <input type="email" name="email" placeholder="Email Address" required>
-                    <button type="submit" class="sub-btn" id="submit-btn">Unlock Download</button>
+                    <button type="submit" class="sub-btn" id="submit-btn">Get Access</button>
                 </form>
             </div>
             <div id="success-msg">ACCESS GRANTED.</div>
@@ -85,7 +87,6 @@
     </div>
 
     <script>
-        // --- PLAYER LOGIC ---
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
         const playlist = [
             { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think" },
@@ -106,6 +107,7 @@
         function enableAudio() { 
             player.muted = false; 
             document.getElementById('unmuteBtn').style.display = 'none'; 
+            // Molti video ads in-stream partono solo dopo la prima interazione dell'utente
         }
 
         function stopVideo() { player.paused ? player.play() : player.pause(); }
@@ -114,8 +116,7 @@
 
         player.onended = nextVideo;
         loadVideo(currentVideoIndex);
-        
-        // Form Management
+
         document.getElementById('dedalo-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
