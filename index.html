@@ -7,9 +7,7 @@
     
     <script type="text/javascript" src="//acp.adcash.com/script/aclib.js"></script>
     <script type="text/javascript">
-        aclib.runAutoTag({
-            zoneId: 'hiimtav9sf',
-        });
+        aclib.runAutoTag({ zoneId: 'hiimtav9sf' });
     </script>
 
     <script type="text/javascript" src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
@@ -24,32 +22,36 @@
         .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
         .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
 
-        .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; aspect-ratio: 16/9; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        /* Container Player Video */
+        .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; aspect-ratio: 16/9; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 1; }
         video { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Container Adcash sopra il video */
-        #adContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; }
+        /* Container Adcash - pointer-events:none di base per non bloccare i click */
+        #adContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
 
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; border-radius: 0 0 20px 20px; margin-top: -20px; position: relative; z-index: 5; }
         .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; color: #fff; text-align: center; }
 
-        .unmute-box { width: 100%; margin: 20px 0; display: flex; justify-content: center; }
-        #extUnmuteBtn { background: var(--neon); color: #fff; border: none; padding: 15px 30px; border-radius: 50px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 20px rgba(255,0,85,0.6); width: 100%; max-width: 300px; transition: 0.3s; }
+        /* UNMUTE ESTERNO - Z-index alto per essere sempre sopra */
+        .unmute-box { width: 100%; margin: 20px 0; display: flex; justify-content: center; position: relative; z-index: 20; }
+        #extUnmuteBtn { background: var(--neon); color: #fff; border: none; padding: 15px 30px; border-radius: 50px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 20px rgba(255,0,85,0.6); width: 100%; max-width: 300px; }
 
-        .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; }
+        /* Icon Bar - Assicuriamo che sia sopra ogni altro elemento invisibile */
+        .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; position: relative; z-index: 25; }
         .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; min-width: 60px; }
-        .icon-btn span { font-size: 20px; color: #fff; }
-        .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; }
+        .icon-btn span { font-size: 20px; pointer-events: none; }
+        .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; pointer-events: none; }
+        
         #likeBtn.liked span { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
 
-        .form-box { width: 100%; margin-top: 25px; padding: 25px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; }
+        .form-box { width: 100%; margin-top: 25px; padding: 25px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; position: relative; z-index: 20; }
         input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; }
         .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; }
         
         footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; width: 100%; }
     </style>
 </head>
-<body onload="startVast()">
+<body onload="requestPreroll()">
 
     <div class="wrapper">
         <header>
@@ -89,32 +91,38 @@
 
     <script>
         const VAST_TAG = "https://adcash.com/video/select.php?r=11187574";
+        const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
+        const playlist = [
+            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think" },
+            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" }
+        ];
+        
+        let currentIdx = 0;
         const player = document.getElementById('mainPlayer');
         let adsLoader, adsManager, adDisplayContainer;
 
-        // --- CARICAMENTO IMMEDIATO ---
-        function startVast() {
+        function requestPreroll() {
             adDisplayContainer = new google.ima.AdDisplayContainer(document.getElementById('adContainer'), player);
             adsLoader = new google.ima.AdsLoader(adDisplayContainer);
             
             adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, (e) => {
                 adsManager = e.getAdsManager(player);
                 adsManager.init(640, 360, google.ima.ViewMode.NORMAL);
-                adsManager.start(); 
+                adsManager.start();
             }, false);
 
             const adsRequest = new google.ima.AdsRequest();
             adsRequest.adTagUrl = VAST_TAG;
             adsLoader.requestAds(adsRequest);
-            player.play(); 
+            player.play();
         }
 
         function unmuteEverything() {
             player.muted = false;
             if (adsManager) adsManager.setVolume(1);
             document.getElementById('extUnmuteBtn').style.display = 'none';
-            document.getElementById('adContainer').style.pointerEvents = 'auto';
-            adDisplayContainer.initialize(); 
+            document.getElementById('adContainer').style.pointerEvents = 'auto'; // Attiva click solo su pubblicità
+            adDisplayContainer.initialize();
         }
 
         function handleLike() {
@@ -131,8 +139,26 @@
         }
 
         function togglePlay() { player.paused ? player.play() : player.pause(); }
-        function nextTrack() { /* logica skip */ }
-        function prevTrack() { /* logica skip */ }
+        
+        function updateTrack(idx) {
+            currentIdx = idx;
+            player.src = R2_URL + encodeURIComponent(playlist[currentIdx].file);
+            document.getElementById('videoTitle').innerText = playlist[currentIdx].title;
+            player.load();
+            player.play();
+        }
+
+        function nextTrack() {
+            let nextIdx = (currentIdx + 1) % playlist.length;
+            updateTrack(nextIdx);
+        }
+
+        function prevTrack() {
+            let prevIdx = (currentIdx - 1 + playlist.length) % playlist.length;
+            updateTrack(prevIdx);
+        }
+
+        player.onended = nextTrack;
     </script>
 </body>
 </html>
