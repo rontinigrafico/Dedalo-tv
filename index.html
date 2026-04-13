@@ -4,14 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     
-    <script type="text/javascript" src="//acp.adcash.com/script/aclib.js"></script>
-
-    <script type="text/javascript">
-        aclib.runAutoTag({
-            zoneId: 'qqjauvswqt',
-        });
-    </script>
-
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+    
     <title>DEDALO TV</title>
     <style>
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
@@ -23,9 +18,9 @@
         .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
         .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
 
-        /* Container ottimizzato per Video Ads */
+        /* Container Player Professionale */
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; cursor: pointer; }
+        .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9; cursor: pointer; }
         
         #unmuteBtn { position: absolute; bottom: 12px; right: 12px; background: var(--neon); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; z-index: 999; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,85,0.5); }
 
@@ -56,10 +51,9 @@
         </header>
 
         <div class="video-container">
-            <button id="unmuteBtn" onclick="enableAudio()">🔇 TAP TO UNMUTE</button>
-            <video id="dedaloPlayer" autoplay muted playsinline>
-                <source src="" type="video/mp4">
-            </video>
+            <button id="unmuteBtn" onclick="enableAudio()">🔇 TAP TO START</button>
+            <video id="dedaloPlayer" class="video-js vjs-default-skin" playsinline muted></video>
+            
             <div class="info-bar">
                 <div class="now-playing">Direct Broadcast</div>
                 <div id="videoTitle" class="video-title">Tuning in...</div>
@@ -74,11 +68,11 @@
 
         <div class="form-box">
             <div id="form-content">
-                <h3 style="font-size:11px; text-transform:uppercase; color:var(--light-gray); margin-bottom:15px;">Download HQ Pack</h3>
+                <h3 style="font-size:11px; text-transform:uppercase; color:var(--light-gray); margin-bottom:15px;">Get Access</h3>
                 <form id="dedalo-form" action="https://formspree.io/f/mnjokbww" method="POST">
                     <input type="text" name="nickname" placeholder="Nickname" required>
                     <input type="email" name="email" placeholder="Email Address" required>
-                    <button type="submit" class="sub-btn" id="submit-btn">Get Access</button>
+                    <button type="submit" class="sub-btn" id="submit-btn">Unlock</button>
                 </form>
             </div>
             <div id="success-msg">ACCESS GRANTED.</div>
@@ -86,37 +80,57 @@
         <footer>DEDALO &copy; 2026</footer>
     </div>
 
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/script/videojs-ima/1.11.0/videojs.ima.min.js"></script>
+
     <script>
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
+        const VAST_TAG = "https://adcash.com/video/select.php?r=11187314"; // Il tuo link VAST Adcash
+        
         const playlist = [
             { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think" },
             { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" }
         ];
 
         let currentVideoIndex = 0;
-        const player = document.getElementById('dedaloPlayer');
+
+        // Inizializzazione Video.js
+        const player = videojs('dedaloPlayer', {
+            autoplay: 'muted',
+            controls: false,
+            responsive: true,
+            fluid: true
+        });
+
+        // Configurazione IMA/VAST
+        player.ima({
+            adTagUrl: VAST_TAG,
+            showCountdown: true
+        });
 
         function loadVideo(index) {
             const video = playlist[index];
-            player.src = R2_URL + encodeURIComponent(video.file);
+            player.src({ type: 'video/mp4', src: R2_URL + encodeURIComponent(video.file) });
             document.getElementById('videoTitle').innerText = video.title;
-            player.load();
-            player.play().catch(e => {});
+            player.play().catch(e => console.log("User interaction needed"));
         }
 
         function enableAudio() { 
-            player.muted = false; 
+            // Questo click dell'utente sblocca sia l'audio che la possibilità di caricare Ads
+            player.muted(false);
+            player.ima.initializeAdDisplayContainer();
+            player.ima.requestAds();
             document.getElementById('unmuteBtn').style.display = 'none'; 
-            // Molti video ads in-stream partono solo dopo la prima interazione dell'utente
+            loadVideo(currentVideoIndex);
         }
 
-        function stopVideo() { player.paused ? player.play() : player.pause(); }
+        function stopVideo() { player.paused() ? player.play() : player.pause(); }
         function nextVideo() { currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
         function prevVideo() { currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; loadVideo(currentVideoIndex); }
 
-        player.onended = nextVideo;
-        loadVideo(currentVideoIndex);
-
+        player.on('ended', nextVideo);
+        
+        // Form Management
         document.getElementById('dedalo-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
