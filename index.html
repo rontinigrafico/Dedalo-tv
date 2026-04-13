@@ -27,6 +27,7 @@
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; aspect-ratio: 16/9; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         video { width: 100%; height: 100%; object-fit: cover; }
         
+        /* Contenitore Adcash VAST sopra il video */
         #adContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; }
 
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; border-radius: 0 0 20px 20px; margin-top: -20px; position: relative; z-index: 5; }
@@ -34,11 +35,10 @@
 
         .unmute-box { width: 100%; margin: 20px 0; display: flex; justify-content: center; }
         #extUnmuteBtn { background: var(--neon); color: #fff; border: none; padding: 15px 30px; border-radius: 50px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 20px rgba(255,0,85,0.6); width: 100%; max-width: 300px; transition: 0.3s; }
-        #extUnmuteBtn:active { transform: scale(0.95); }
 
         .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; }
         .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; min-width: 60px; }
-        .icon-btn span { font-size: 20px; color: #fff; }
+        .icon-btn span { font-size: 20px; }
         .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; }
         
         #likeBtn.liked span { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
@@ -92,7 +92,7 @@
     </div>
 
     <script>
-        const VAST_TAG = "https://adcash.com/video/select.php?r=11187314";
+        const VAST_TAG = "https://adcash.com/video/select.php?r=11187574";
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
         const playlist = [
             "Red%20Think%20-%20Badret%20-%20Official%20video.mp4",
@@ -103,7 +103,7 @@
         const player = document.getElementById('mainPlayer');
         let adsLoader, adsManager, adDisplayContainer;
 
-        // Richiesta pubblicità immediata all'avvio
+        // --- CARICAMENTO IMMEDIATO (YT STYLE) ---
         function requestPreroll() {
             adDisplayContainer = new google.ima.AdDisplayContainer(document.getElementById('adContainer'), player);
             adsLoader = new google.ima.AdsLoader(adDisplayContainer);
@@ -111,13 +111,13 @@
             adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, (e) => {
                 adsManager = e.getAdsManager(player);
                 adsManager.init(640, 360, google.ima.ViewMode.NORMAL);
-                adsManager.start();
+                adsManager.start(); // Parte muto per bypassare i blocchi browser
             }, false);
 
             const adsRequest = new google.ima.AdsRequest();
             adsRequest.adTagUrl = VAST_TAG;
             adsLoader.requestAds(adsRequest);
-            player.play();
+            player.play(); // Avvia il video principale in background (muto)
         }
 
         function unmuteEverything() {
@@ -125,7 +125,7 @@
             if (adsManager) adsManager.setVolume(1);
             document.getElementById('extUnmuteBtn').style.display = 'none';
             document.getElementById('adContainer').style.pointerEvents = 'auto';
-            adDisplayContainer.initialize();
+            adDisplayContainer.initialize(); // Sblocca l'interazione audio per il browser
         }
 
         function handleLike() {
