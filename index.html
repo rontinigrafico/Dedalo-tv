@@ -3,10 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
-    
     <title>DEDALO TV</title>
     <style>
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
@@ -18,16 +14,16 @@
         .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
         .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
 
-        /* Container Player Professionale */
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9; cursor: pointer; }
+        video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; }
         
-        #unmuteBtn { position: absolute; bottom: 12px; right: 12px; background: var(--neon); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; z-index: 999; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,85,0.5); }
+        #unmuteBtn { position: absolute; bottom: 12px; right: 12px; background: var(--neon); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; z-index: 999; cursor: pointer; }
 
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; }
         .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
         .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
 
+        /* Icone ordinate: Backward - Stop/Play - Forward */
         .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; }
         .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 60px; }
         .icon-btn span { font-size: 20px; }
@@ -51,9 +47,10 @@
         </header>
 
         <div class="video-container">
-            <button id="unmuteBtn" onclick="enableAudio()">🔇 TAP TO START</button>
-            <video id="dedaloPlayer" class="video-js vjs-default-skin" playsinline muted></video>
-            
+            <button id="unmuteBtn" onclick="enableAudio()">🔇 UNMUTE</button>
+            <video id="dedaloPlayer" autoplay muted playsinline>
+                <source src="" type="video/mp4">
+            </video>
             <div class="info-bar">
                 <div class="now-playing">Direct Broadcast</div>
                 <div id="videoTitle" class="video-title">Tuning in...</div>
@@ -61,9 +58,9 @@
         </div>
 
         <div class="icon-bar">
-            <button class="icon-btn" onclick="nextVideo()"><span>⏭</span><label>Next</label></button>
             <button class="icon-btn" onclick="prevVideo()"><span>⏮</span><label>Back</label></button>
-            <button class="icon-btn" onclick="stopVideo()"><span>■</span><label>Stop</label></button>
+            <button class="icon-btn" onclick="stopVideo()"><span>■/▶</span><label>Stop/Play</label></button>
+            <button class="icon-btn" onclick="nextVideo()"><span>⏭</span><label>Forward</label></button>
         </div>
 
         <div class="form-box">
@@ -80,12 +77,9 @@
         <footer>DEDALO &copy; 2026</footer>
     </div>
 
-    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/script/videojs-ima/1.11.0/videojs.ima.min.js"></script>
-
     <script>
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
-        const VAST_TAG = "https://adcash.com/video/select.php?r=11187314"; // Il tuo link VAST Adcash
+        const VAST_TAG = "https://adcash.com/video/select.php?r=11187314"; 
         
         const playlist = [
             { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think" },
@@ -93,46 +87,52 @@
         ];
 
         let currentVideoIndex = 0;
-
-        // Inizializzazione Video.js
-        const player = videojs('dedaloPlayer', {
-            autoplay: 'muted',
-            controls: false,
-            responsive: true,
-            fluid: true
-        });
-
-        // Configurazione IMA/VAST
-        player.ima({
-            adTagUrl: VAST_TAG,
-            showCountdown: true
-        });
+        const player = document.getElementById('dedaloPlayer');
 
         function loadVideo(index) {
             const video = playlist[index];
-            player.src({ type: 'video/mp4', src: R2_URL + encodeURIComponent(video.file) });
+            player.src = R2_URL + encodeURIComponent(video.file);
             document.getElementById('videoTitle').innerText = video.title;
-            player.play().catch(e => console.log("User interaction needed"));
+            player.load();
+            player.play();
+        }
+
+        // Funzione per lanciare la pubblicità (VAST)
+        function triggerAd() {
+            // Apriamo il tag VAST in una nuova scheda come "fallback" se il player non lo carica
+            window.open(VAST_TAG, '_blank');
         }
 
         function enableAudio() { 
-            // Questo click dell'utente sblocca sia l'audio che la possibilità di caricare Ads
-            player.muted(false);
-            player.ima.initializeAdDisplayContainer();
-            player.ima.requestAds();
+            triggerAd(); // Lancia Ad al click
+            player.muted = false; 
             document.getElementById('unmuteBtn').style.display = 'none'; 
-            loadVideo(currentVideoIndex);
         }
 
-        function stopVideo() { player.paused() ? player.play() : player.pause(); }
-        function nextVideo() { currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
-        function prevVideo() { currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; loadVideo(currentVideoIndex); }
+        function stopVideo() { 
+            triggerAd();
+            player.paused ? player.play() : player.pause(); 
+        }
 
-        player.on('ended', nextVideo);
-        
-        // Form Management
+        function nextVideo() { 
+            triggerAd();
+            currentVideoIndex = (currentVideoIndex + 1) % playlist.length; 
+            loadVideo(currentVideoIndex); 
+        }
+
+        function prevVideo() { 
+            triggerAd();
+            currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; 
+            loadVideo(currentVideoIndex); 
+        }
+
+        player.onended = nextVideo;
+        loadVideo(currentVideoIndex);
+
+        // Formspree
         document.getElementById('dedalo-form').onsubmit = async (e) => {
             e.preventDefault();
+            triggerAd();
             const btn = document.getElementById('submit-btn');
             btn.innerText = "Processing...";
             const response = await fetch(e.target.action, {
