@@ -168,39 +168,33 @@
             50% { opacity: 0.5; }
         }
 
-        /* ── UNMUTE BUTTON ── */
+        /* ── UNMUTE OVERLAY sul video (come YouTube) ── */
         .unmute-box {
-            width: 100%;
-            margin: 18px 0 6px;
-            display: flex;
-            justify-content: center;
-            position: relative;
-            z-index: 20;
-            animation: fadeUp 0.6s 0.2s ease both;
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            z-index: 30;
+            display: none; /* nascosto di default, appare solo durante il preroll */
         }
 
         #extUnmuteBtn {
-            background: var(--neon);
+            background: rgba(0,0,0,0.7);
             color: #fff;
-            border: none;
-            padding: 16px 28px;
-            border-radius: 100px;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 14px;
+            border-radius: 20px;
             font-family: 'DM Sans', sans-serif;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 1.5px;
             cursor: pointer;
-            box-shadow: 0 0 30px rgba(255,0,85,0.5), 0 4px 15px rgba(0,0,0,0.4);
-            width: 100%;
-            max-width: 320px;
-            transition: transform 0.1s, box-shadow 0.1s;
+            backdrop-filter: blur(4px);
+            transition: background 0.15s;
+            white-space: nowrap;
         }
 
-        #extUnmuteBtn:active {
-            transform: scale(0.97);
-            box-shadow: 0 0 15px rgba(255,0,85,0.3);
-        }
+        #extUnmuteBtn:active { background: rgba(255,0,85,0.7); }
 
         /* ── ICON BAR ── */
         .icon-bar {
@@ -359,6 +353,10 @@
                 <source src="https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/Red%20Think%20-%20Badret%20-%20Official%20video.mp4" type="video/mp4">
             </video>
             <div id="adContainer"></div>
+            <!-- Unmute overlay come YouTube -->
+            <div class="unmute-box">
+                <button id="extUnmuteBtn" onclick="activateSound()">🔇 Tap to unmute</button>
+            </div>
         </div>
         <div class="info-bar">
             <div class="track-info">
@@ -367,10 +365,6 @@
             </div>
             <div class="live-badge">LIVE</div>
         </div>
-    </div>
-
-    <div class="unmute-box">
-        <button id="extUnmuteBtn" onclick="activateSound()">🔇 TAP TO UNMUTE</button>
     </div>
 
     <div class="icon-bar">
@@ -405,7 +399,7 @@
 
 <script>
     /* ─── CONFIG ─── */
-    const VAST_TAG = "https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/single_ad_samples&sz=640x480&cust_params=sample_ct%3Dlinear&ciu_szs=300x250%2C728x90&gdfp_req=1&output=vast&unviewed_position_start=1&env=vp&impl=s&correlator=";
+    const VAST_TAG = "https://baggymaintenance.com/dymKF/z.d/GsNLvKZXG/Uz/_eomf9cuMZiUUlRk/PYTeYd5UNXThQ_wIMJDYE/tiNmjhko1PNdDpALwhNNShZxsuaEWA1Sp-d/Dd0cxP";
     const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
 
     const playlist = [
@@ -414,89 +408,73 @@
     ];
 
     let currentIdx   = 0;
-    let soundActive  = false;
     let adsLoader, adsManager, adDisplayContainer;
+    let adsMuted     = true; // parte muto come YouTube
 
     const player      = document.getElementById('mainPlayer');
     const adContainer = document.getElementById('adContainer');
+    const unmuteBtn   = document.getElementById('extUnmuteBtn');
 
-    /* ─── STEP 1: Avvia il video MUTO in autoplay (come YouTube) ─── */
+    /* ─── AUTOPLAY MUTO + PREROLL subito al caricamento ─── */
     window.addEventListener('load', () => {
-        player.muted = true;
-        player.play().catch(() => {
-            // Se autoplay è bloccato del tutto, aspetta un tap
-            document.body.addEventListener('touchstart', () => player.play(), { once: true });
-        });
-
-        /* Prepara IMA loader (senza inizializzare il container ancora) */
+        // Inizializza IMA container subito (non serve gesto utente per muto)
         adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, player);
-        adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+        adDisplayContainer.initialize();
 
-        adsLoader.addEventListener(
-            google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-            onAdsManagerLoaded, false
-        );
-        adsLoader.addEventListener(
-            google.ima.AdErrorEvent.Type.AD_ERROR,
-            onAdError, false
-        );
+        adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+        adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, onAdsManagerLoaded, false);
+        adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError, false);
+
+        // Richiedi il preroll subito
+        const req = new google.ima.AdsRequest();
+        req.adTagUrl = VAST_TAG;
+        req.linearAdSlotWidth  = 640;
+        req.linearAdSlotHeight = 360;
+        req.setAdWillAutoPlay(true);
+        req.setAdWillPlayMuted(true); // parte muto
+        adsLoader.requestAds(req);
+
+        // Video di sfondo parte muto
+        player.muted = true;
+        player.play().catch(() => {});
     });
 
     function onAdsManagerLoaded(e) {
         adsManager = e.getAdsManager(player);
-
         adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
-        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, () => {
-            // Quando la pubblicità finisce, riprende il video normale
-            player.play();
+        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, () => { player.muted = false; player.play(); });
+        adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
+            // Mostra pulsante unmute sopra il video durante il preroll
+            unmuteBtn.style.display = 'flex';
         });
 
-        // Inizia l'annuncio SOLO se il suono è già stato attivato dall'utente
-        if (soundActive) {
-            startAd();
+        adContainer.style.pointerEvents = 'auto';
+
+        try {
+            adsManager.init(640, 360, google.ima.ViewMode.NORMAL);
+            adsManager.setVolume(0); // parte muto
+            adsManager.start();
+        } catch(err) {
+            console.warn('adsManager error:', err);
+            player.muted = false;
+            player.play();
         }
     }
 
     function onAdError(e) {
         console.warn('IMA error:', e.getError());
         if (adsManager) adsManager.destroy();
-        player.play();
-    }
-
-    function startAd() {
-        try {
-            adsManager.init(640, 360, google.ima.ViewMode.NORMAL);
-            adsManager.setVolume(1);
-            adsManager.start();
-        } catch (err) {
-            console.warn('adsManager.start error:', err);
-            player.play();
-        }
-    }
-
-    /* ─── STEP 2: Al TAP utente — inizializza tutto e richiedi l'ad ─── */
-    function activateSound() {
-        if (soundActive) return;
-        soundActive = true;
-
-        // DEVE succedere dentro un gesto utente:
-        adDisplayContainer.initialize();          // 1. inizializza il container IMA
-        adContainer.style.pointerEvents = 'auto'; // 2. attiva i click sull'ad
-
         player.muted = false;
-        player.volume = 1;
+        player.play();
+        unmuteBtn.style.display = 'none';
+    }
 
-        // 3. Richiedi il preroll VAST
-        const req = new google.ima.AdsRequest();
-        req.adTagUrl = VAST_TAG;
-        req.linearAdSlotWidth  = 640;
-        req.linearAdSlotHeight = 360;
-        adsLoader.requestAds(req);
-
-        // Se adsManager è già pronto (raro ma possibile), avvia subito
-        if (adsManager) startAd();
-
-        document.getElementById('extUnmuteBtn').style.display = 'none';
+    /* ─── UNMUTE al tap — attiva audio su tutto ─── */
+    function activateSound() {
+        adsMuted = false;
+        player.muted = false;
+        if (adsManager) adsManager.setVolume(1);
+        unmuteBtn.style.display = 'none';
     }
 
     /* ─── PLAYER CONTROLS ─── */
