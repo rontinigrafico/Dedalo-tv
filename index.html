@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     
-    <meta name="monetag" content="9406e45f71c280055309ffdc68c7ec90">
-    <script src="https://quge5.com/88/tag.min.js" data-zone="229076" async data-cfasync="false"></script>
+    <script type="text/javascript" src="//acp.adcash.com/script/aclib.js"></script>
+    <script type="text/javascript">
+        aclib.runAutoTag({
+            zoneId: 'qqjauvswqt',
+        });
+    </script>
 
     <title>DEDALO TV</title>
     <style>
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; min-height: 100vh; }
         .wrapper { width: 100%; max-width: 420px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
         header { text-align: center; margin-bottom: 25px; width: 100%; }
@@ -41,7 +45,7 @@
         footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; width: 100%; }
     </style>
 </head>
-<body onbeforeunload="return silentPop()">
+<body>
 
     <div class="wrapper">
         <header>
@@ -51,7 +55,7 @@
 
         <div class="video-container">
             <button id="unmuteBtn" onclick="enableAudio()">🔇 TAP TO UNMUTE</button>
-            <video id="dedaloPlayer" autoplay muted playsinline onclick="handleInteraction()">
+            <video id="dedaloPlayer" autoplay muted playsinline>
                 <source src="" type="video/mp4">
             </video>
             <div class="info-bar">
@@ -61,11 +65,9 @@
         </div>
 
         <div class="icon-bar">
-            <button class="icon-btn" onclick="handleInteraction()"><span>♡</span><label>2.4k</label></button>
+            <button class="icon-btn" onclick="nextVideo()"><span>⏭</span><label>Next</label></button>
             <button class="icon-btn" onclick="prevVideo()"><span>⏮</span><label>Back</label></button>
             <button class="icon-btn" onclick="stopVideo()"><span>■</span><label>Stop</label></button>
-            <button class="icon-btn" onclick="nextVideo()"><span>⏭</span><label>Next</label></button>
-            <button class="icon-btn" onclick="handleInteraction()"><span>⎋</span><label>Share</label></button>
         </div>
 
         <div class="form-box">
@@ -77,60 +79,12 @@
                     <button type="submit" class="sub-btn" id="submit-btn">Unlock Download</button>
                 </form>
             </div>
-            <div id="success-msg">ACCESS GRANTED.<br>CHECKING FOR CRYPTO REWARDS...</div>
+            <div id="success-msg">ACCESS GRANTED.</div>
         </div>
         <footer>DEDALO &copy; 2026</footer>
     </div>
 
     <script>
-        // --- CONFIGURAZIONE MONETIZZAZIONE ---
-        const DIRECT_LINK = "https://omg10.com/4/10867749"; 
-        let hasPopped = false;
-
-        function silentPop() {
-            // Apre il link in una nuova scheda ma cerca di non interrompere l'utente
-            const win = window.open(DIRECT_LINK, '_blank');
-            if (win) {
-                win.blur();
-                window.focus();
-            }
-            return "Wait! Don't miss the crypto rewards!";
-        }
-
-        function handleInteraction() {
-            // Spariamo il pop-under solo se non è già stato aperto in questa sessione
-            if (!hasPopped) {
-                silentPop();
-                hasPopped = true;
-            } else {
-                // Dopo il primo pop-under, gli altri click hanno il 20% di chance di riaprirlo
-                if (Math.random() < 0.2) { window.open(DIRECT_LINK, '_blank'); }
-            }
-        }
-
-        // Gestione Form con Arbitraggio Finale
-        const form = document.getElementById('dedalo-form');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            window.open(DIRECT_LINK, '_blank'); // Click forzato all'invio
-            const btn = document.getElementById('submit-btn');
-            btn.innerText = "Processing...";
-            
-            const data = new FormData(form);
-            const response = await fetch(form.action, {
-                method: 'POST',
-                body: data,
-                headers: { 'Accept': 'application/json' }
-            });
-
-            if (response.ok) {
-                document.getElementById('form-content').style.display = 'none';
-                document.getElementById('success-msg').style.display = 'block';
-                // Redirect finale allo SmartLink dopo 3 secondi
-                setTimeout(() => { window.location.href = DIRECT_LINK; }, 3000);
-            }
-        };
-
         // --- PLAYER LOGIC ---
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
         const playlist = [
@@ -150,17 +104,32 @@
         }
 
         function enableAudio() { 
-            handleInteraction(); // Primo Pop-under al click audio
             player.muted = false; 
             document.getElementById('unmuteBtn').style.display = 'none'; 
         }
 
-        function stopVideo() { handleInteraction(); player.paused ? player.play() : player.pause(); }
-        function nextVideo() { handleInteraction(); currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
-        function prevVideo() { handleInteraction(); currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; loadVideo(currentVideoIndex); }
+        function stopVideo() { player.paused ? player.play() : player.pause(); }
+        function nextVideo() { currentVideoIndex = (currentVideoIndex + 1) % playlist.length; loadVideo(currentVideoIndex); }
+        function prevVideo() { currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; loadVideo(currentVideoIndex); }
 
         player.onended = nextVideo;
         loadVideo(currentVideoIndex);
+        
+        // Form Management
+        document.getElementById('dedalo-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "Processing...";
+            const response = await fetch(e.target.action, {
+                method: 'POST',
+                body: new FormData(e.target),
+                headers: { 'Accept': 'application/json' }
+            });
+            if (response.ok) {
+                document.getElementById('form-content').style.display = 'none';
+                document.getElementById('success-msg').style.display = 'block';
+            }
+        };
     </script>
 </body>
 </html>
