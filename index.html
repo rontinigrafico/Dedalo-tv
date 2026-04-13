@@ -5,28 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>DEDALO TV</title>
     
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+    
     <style>
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; display: flex; justify-content: center; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; min-height: 100vh; }
         .wrapper { width: 100%; max-width: 420px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
-        header { text-align: center; margin-bottom: 25px; }
-        .logo-img { width: 140px; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
+        header { text-align: center; margin-bottom: 25px; width: 100%; }
+        .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
 
-        .video-container { width: 100%; border-radius: 20px; overflow: hidden; border: 1px solid #111; background: #000; position: relative; }
+        .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; aspect-ratio: 16/9; }
+        video { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Layout Bottoni: Backward | Stop-Play | Forward */
-        .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; }
-        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; }
-        .icon-btn:active { transform: scale(0.9); }
-        .icon-btn span { font-size: 24px; margin-bottom: 5px; }
-        .icon-btn label { font-size: 10px; color: var(--light-gray); text-transform: uppercase; }
+        /* Tasto Unmute sopra il video */
+        #unmuteBtn { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: #fff; border: none; font-weight: bold; font-size: 14px; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; text-transform: uppercase; letter-spacing: 2px; }
+        #unmuteBtn span { background: var(--neon); padding: 10px 20px; border-radius: 50px; box-shadow: 0 0 20px var(--neon); }
 
-        .form-box { width: 100%; margin-top: 20px; padding: 20px; background: var(--panel); border-radius: 15px; border: 1px solid #111; }
-        input { width: 100%; background: #000; border: 1px solid #222; padding: 12px; color: #fff; margin-bottom: 10px; border-radius: 8px; }
-        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 15px; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; }
+        .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
+
+        .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; }
+        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 80px; }
+        .icon-btn span { font-size: 24px; margin-bottom: 5px; }
+        .icon-btn label { font-size: 9px; color: var(--light-gray); text-transform: uppercase; }
+
+        .form-box { width: 100%; margin-top: 25px; padding: 25px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; }
+        input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; }
+        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -36,77 +43,101 @@
             <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" alt="DEDALO LOGO" class="logo-img">
         </header>
 
-        <div class="video-container">
-            <video id="my-video" class="video-js vjs-default-skin vjs-16-9" playsinline muted></video>
+        <div class="video-container" id="ad-container">
+            <button id="unmuteBtn" onclick="startEverything()"><span>🔇 TAP TO START</span></button>
+            <video id="mainPlayer" playsinline muted></video>
         </div>
 
         <div class="icon-bar">
-            <button class="icon-btn" onclick="goPrev()"><span>⏮</span><label>Back</label></button>
-            <button class="icon-btn" onclick="goToggle()"><span>⏯</span><label>Stop/Play</label></button>
-            <button class="icon-btn" onclick="goNext()"><span>⏭</span><label>Forward</label></button>
+            <button class="icon-btn" onclick="prevTrack()"><span>⏮</span><label>Back</label></button>
+            <button class="icon-btn" onclick="togglePlay()"><span>⏯</span><label>Stop/Play</label></button>
+            <button class="icon-btn" onclick="nextTrack()"><span>⏭</span><label>Forward</label></button>
         </div>
 
         <div class="form-box">
             <form id="dedalo-form" action="https://formspree.io/f/mnjokbww" method="POST">
                 <input type="text" name="nickname" placeholder="Nickname" required>
                 <input type="email" name="email" placeholder="Email" required>
-                <button type="submit" class="sub-btn">Unlock HQ</button>
+                <button type="submit" class="sub-btn">Unlock HQ Pack</button>
             </form>
         </div>
     </div>
-
-    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-ima/1.11.0/videojs.ima.min.js"></script>
 
     <script>
         const VAST_TAG = "https://adcash.com/video/select.php?r=11187314";
         const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
         const playlist = [
-            "Red%20Think%20-%20Badret%20-%20Official%20video.mp4",
-            "Future%20Voyage%20-%20Badret.mp4"
+            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think" },
+            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" }
         ];
+
         let currentIdx = 0;
+        const player = document.getElementById('mainPlayer');
+        const unmuteBtn = document.getElementById('unmuteBtn');
 
-        // Inizializza Player
-        var player = videojs('my-video', {
-            autoplay: true,
-            controls: false, // Usiamo i nostri pulsanti
-            muted: true
-        });
-
-        // Configura IMA (VAST)
-        player.ima({
-            adTagUrl: VAST_TAG
-        });
-
-        function loadVideo(idx) {
-            player.src({ type: 'video/mp4', src: R2_URL + playlist[idx] });
-            player.play();
+        // Carica video iniziale
+        function loadTrack(idx) {
+            player.src = R2_URL + encodeURIComponent(playlist[idx].file);
+            player.load();
+            player.play().catch(e => console.log("Autoplay blocked"));
         }
 
-        // Funzioni pulsanti (Ora funzionano perché isolate)
-        function goToggle() {
-            if (player.paused()) { player.play(); } else { player.pause(); }
+        // FUNZIONE UNICA PER FAR PARTIRE TUTTO
+        function startEverything() {
+            unmuteBtn.style.display = 'none';
+            player.muted = false;
+            
+            // Prova a caricare l'annuncio VAST (se Adcash risponde)
+            // Se l'annuncio fallisce, il video di Badret continuerà normalmente
+            requestAds();
+            
+            loadTrack(currentIdx);
         }
 
-        function goNext() {
+        function togglePlay() {
+            if (player.paused) player.play(); else player.pause();
+        }
+
+        function nextTrack() {
             currentIdx = (currentIdx + 1) % playlist.length;
-            loadVideo(currentIdx);
+            loadTrack(currentIdx);
         }
 
-        function goPrev() {
+        function prevTrack() {
             currentIdx = (currentIdx - 1 + playlist.length) % playlist.length;
-            loadVideo(currentIdx);
+            loadTrack(currentIdx);
         }
 
-        // Avvio
-        loadVideo(currentIdx);
-        
-        // Richiesta Ad al caricamento
-        player.on('readyforpreroll', function() {
-            player.ima.requestAds();
-        });
+        player.onended = nextTrack;
+        loadTrack(currentIdx);
+
+        // --- LOGICA VAST (IMA SDK) ---
+        let adsLoader;
+        let adsManager;
+        let adDisplayContainer;
+
+        function requestAds() {
+            const adContainer = document.getElementById('ad-container');
+            adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, player);
+            adDisplayContainer.initialize();
+            
+            adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+            adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, onAdsManagerLoaded, false);
+            
+            const adsRequest = new google.ima.AdsRequest();
+            adsRequest.adTagUrl = VAST_TAG;
+            adsLoader.requestAds(adsRequest);
+        }
+
+        function onAdsManagerLoaded(adsManagerLoadedEvent) {
+            adsManager = adsManagerLoadedEvent.getAdsManager(player);
+            try {
+                adsManager.init(640, 360, google.ima.ViewMode.NORMAL);
+                adsManager.start();
+            } catch (adError) {
+                player.play();
+            }
+        }
     </script>
 </body>
 </html>
