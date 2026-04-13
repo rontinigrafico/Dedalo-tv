@@ -106,24 +106,13 @@
             display: block;
         }
 
-        /* IMA ad container - sopra il video ma inizialmente non intercetta click */
+        /* IMA ad container */
         #adContainer {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 10;
             pointer-events: none;
-            background: transparent;
-        }
-
-        /* Forza visibilità elementi IMA */
-        #adContainer * { visibility: visible !important; }
-        #adContainer video { 
-            position: absolute;
-            top: 0; left: 0;
-            width: 100% !important; 
-            height: 100% !important;
-            object-fit: contain;
         }
 
         /* ── INFO BAR ── */
@@ -409,7 +398,6 @@
 </div>
 
 <script>
-    /* ─── CONFIG ─── */
     const VAST_TAG = "https://baggymaintenance.com/dymKF/z.d/GsNLvKZXG/Uz/_eomf9cuMZiUUlRk/PYTeYd5UNXThQ_wIMJDYE/tiNmjhko1PNdDpALwhNNShZxsuaEWA1Sp-d/Dd0cxP";
     const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
 
@@ -418,17 +406,18 @@
         { file: "Future Voyage - Badret.mp4",               title: "BADRET — Future Voyage" }
     ];
 
-    let currentIdx   = 0;
+    let currentIdx = 0;
     let adsLoader, adsManager, adDisplayContainer;
-    let adsMuted     = true; // parte muto come YouTube
+    let imaReady   = false;
+    let muted      = true;
 
     const player      = document.getElementById('mainPlayer');
     const adContainer = document.getElementById('adContainer');
     const unmuteBtn   = document.getElementById('extUnmuteBtn');
 
-    /* ─── AUTOPLAY MUTO + PREROLL subito al caricamento ─── */
+    /* ── INIT IMA una volta sola al load ── */
     window.addEventListener('load', () => {
-        // Inizializza IMA container subito (non serve gesto utente per muto)
+        // Il container IMA va inizializzato subito, PRIMA della richiesta
         adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, player);
         adDisplayContainer.initialize();
 
@@ -436,82 +425,78 @@
         adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, onAdsManagerLoaded, false);
         adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError, false);
 
-        // Richiedi il preroll subito
-        const req = new google.ima.AdsRequest();
-        req.adTagUrl = VAST_TAG;
-        req.linearAdSlotWidth  = 640;
-        req.linearAdSlotHeight = 360;
-        req.setAdWillAutoPlay(true);
-        req.setAdWillPlayMuted(true); // parte muto
-        adsLoader.requestAds(req);
-
-        // Video di sfondo parte muto
         player.muted = true;
         player.play().catch(() => {});
+
+        requestPreroll();
     });
+
+    /* ── RICHIEDI PREROLL ── */
+    function requestPreroll() {
+        if (adsManager) { adsManager.destroy(); adsManager = null; }
+        imaReady = false;
+
+        const req = new google.ima.AdsRequest();
+        req.adTagUrl = VAST_TAG;
+        req.linearAdSlotWidth  = player.offsetWidth  || 640;
+        req.linearAdSlotHeight = player.offsetHeight || 360;
+        req.setAdWillAutoPlay(true);
+        req.setAdWillPlayMuted(true);
+        adsLoader.requestAds(req);
+    }
 
     function onAdsManagerLoaded(e) {
         adsManager = e.getAdsManager(player);
+        imaReady   = true;
+
         adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
 
-        // Quando tutte le ads finiscono → riprendi video con audio
-        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, () => {
-            adContainer.style.pointerEvents = 'none';
-            unmuteBtn.style.display = 'none';
-            player.muted = false;
-            player.play();
-        });
-
-        // Quando l'utente clicca sull'ad e torna → riprendi video
-        adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, () => {
-            adContainer.style.pointerEvents = 'none';
-            unmuteBtn.style.display = 'none';
-            player.muted = false;
-            player.play();
-        });
-
-        // Quando l'ad parte → mostra unmute
         adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
+            // Pausa il video principale mentre gira l'ad
+            player.pause();
+            adContainer.style.pointerEvents = 'auto';
             unmuteBtn.style.display = 'flex';
         });
 
-        // Quando l'ad è completata → nascondi unmute
-        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, () => {
-            unmuteBtn.style.display = 'none';
-        });
+        adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED, resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, resumeContent);
 
-        adContainer.style.pointerEvents = 'auto';
-
+        // Avvia subito
         try {
-            // Usa le dimensioni reali del container per evitare schermo nero
-            const rect = player.getBoundingClientRect();
-            adsManager.init(rect.width || 640, rect.height || 360, google.ima.ViewMode.NORMAL);
-            adsManager.setVolume(0); // parte muto
+            adsManager.init(player.offsetWidth || 640, player.offsetHeight || 360, google.ima.ViewMode.NORMAL);
+            adsManager.setVolume(0);
             adsManager.start();
         } catch(err) {
-            console.warn('adsManager error:', err);
-            player.muted = false;
-            player.play();
+            console.warn('IMA start error:', err);
+            resumeContent();
         }
+    }
+
+    function resumeContent() {
+        adContainer.style.pointerEvents = 'none';
+        unmuteBtn.style.display = 'none';
+        muted = false;
+        player.muted = false;
+        player.play();
     }
 
     function onAdError(e) {
         console.warn('IMA error:', e.getError());
         if (adsManager) adsManager.destroy();
-        player.muted = false;
-        player.play();
-        unmuteBtn.style.display = 'none';
+        resumeContent();
     }
 
-    /* ─── UNMUTE al tap — attiva audio su tutto ─── */
+    /* ── UNMUTE ── */
     function activateSound() {
-        adsMuted = false;
+        muted = false;
         player.muted = false;
         if (adsManager) adsManager.setVolume(1);
         unmuteBtn.style.display = 'none';
     }
 
-    /* ─── PLAYER CONTROLS ─── */
+    /* ── PLAYER CONTROLS ── */
     function handleLike() {
         const counter = document.getElementById('likeCounter');
         const btn     = document.getElementById('likeBtn');
@@ -528,13 +513,8 @@
 
     function togglePlay() {
         const ico = document.getElementById('playIco');
-        if (player.paused) {
-            player.play();
-            ico.textContent = '⏸';
-        } else {
-            player.pause();
-            ico.textContent = '▶';
-        }
+        if (player.paused) { player.play(); ico.textContent = '⏸'; }
+        else               { player.pause(); ico.textContent = '▶'; }
     }
 
     function updateTrack(idx) {
@@ -542,9 +522,10 @@
         const t = playlist[currentIdx];
         player.src = R2_URL + encodeURIComponent(t.file);
         document.getElementById('videoTitle').textContent = t.title;
-        player.load();
-        player.play();
         document.getElementById('playIco').textContent = '⏸';
+        player.load();
+        // Mostra preroll ad ogni cambio traccia
+        requestPreroll();
     }
 
     function nextTrack() { updateTrack((currentIdx + 1) % playlist.length); }
