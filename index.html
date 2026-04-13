@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>DEDALO TV</title>
+    
+    <script src="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js"></script>
+    
     <style>
         :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; min-height: 100vh; }
         .wrapper { width: 100%; max-width: 420px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
@@ -15,15 +18,8 @@
         .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
 
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        video { width: 100%; aspect-ratio: 16/9; display: block; object-fit: cover; }
         
-        #unmuteBtn { position: absolute; bottom: 12px; right: 12px; background: var(--neon); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; z-index: 999; cursor: pointer; }
-
-        .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; }
-        .now-playing { font-size: 9px; color: var(--neon); font-weight: bold; text-transform: uppercase; }
-        .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
-
-        /* Icone ordinate: Backward - Stop/Play - Forward */
+        /* Layout icone richiesto: Back | Stop/Play | Forward */
         .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; }
         .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 60px; }
         .icon-btn span { font-size: 20px; }
@@ -34,7 +30,6 @@
         .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; }
         
         #success-msg { display: none; color: var(--neon); font-size: 13px; font-weight: bold; line-height: 1.6; }
-
         footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; width: 100%; }
     </style>
 </head>
@@ -47,20 +42,15 @@
         </header>
 
         <div class="video-container">
-            <button id="unmuteBtn" onclick="enableAudio()">🔇 UNMUTE</button>
-            <video id="dedaloPlayer" autoplay muted playsinline>
-                <source src="" type="video/mp4">
+            <video id="video-dedalo">
+                <source src="https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/Red%20Think%20-%20Badret%20-%20Official%20video.mp4" type="video/mp4">
             </video>
-            <div class="info-bar">
-                <div class="now-playing">Direct Broadcast</div>
-                <div id="videoTitle" class="video-title">Tuning in...</div>
-            </div>
         </div>
 
         <div class="icon-bar">
-            <button class="icon-btn" onclick="prevVideo()"><span>⏮</span><label>Back</label></button>
-            <button class="icon-btn" onclick="stopVideo()"><span>■/▶</span><label>Stop/Play</label></button>
-            <button class="icon-btn" onclick="nextVideo()"><span>⏭</span><label>Forward</label></button>
+            <button class="icon-btn" onclick="prevVid()"><span>⏮</span><label>Back</label></button>
+            <button class="icon-btn" onclick="toggleVid()"><span>■/▶</span><label>Stop/Play</label></button>
+            <button class="icon-btn" onclick="nextVid()"><span>⏭</span><label>Forward</label></button>
         </div>
 
         <div class="form-box">
@@ -69,7 +59,7 @@
                 <form id="dedalo-form" action="https://formspree.io/f/mnjokbww" method="POST">
                     <input type="text" name="nickname" placeholder="Nickname" required>
                     <input type="email" name="email" placeholder="Email Address" required>
-                    <button type="submit" class="sub-btn" id="submit-btn">Unlock</button>
+                    <button type="submit" class="sub-btn">Unlock</button>
                 </form>
             </div>
             <div id="success-msg">ACCESS GRANTED.</div>
@@ -78,72 +68,54 @@
     </div>
 
     <script>
-        const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/"; 
-        const VAST_TAG = "https://adcash.com/video/select.php?r=11187314"; 
-        
+        const VAST_URL = "https://adcash.com/video/select.php?r=11187314";
+        const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
         const playlist = [
-            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think" },
-            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" }
+            "Red%20Think%20-%20Badret%20-%20Official%20video.mp4",
+            "Future%20Voyage%20-%20Badret.mp4"
         ];
+        let currentIdx = 0;
 
-        let currentVideoIndex = 0;
-        const player = document.getElementById('dedaloPlayer');
+        // Inizializzazione Fluid Player con il tuo Tag VAST
+        var myFP = fluidPlayer('video-dedalo', {
+            vastOptions: {
+                adList: [
+                    {
+                        roll: 'preRoll',
+                        vastTag: VAST_URL
+                    }
+                ]
+            },
+            layoutControls: {
+                fillToContainer: true,
+                autoPlay: true,
+                mute: true,
+                playPauseAnimation: false
+            }
+        });
 
-        function loadVideo(index) {
-            const video = playlist[index];
-            player.src = R2_URL + encodeURIComponent(video.file);
-            document.getElementById('videoTitle').innerText = video.title;
-            player.load();
-            player.play();
+        function toggleVid() { myFP.playPause(); }
+        
+        function nextVid() {
+            currentIdx = (currentIdx + 1) % playlist.length;
+            myFP.setSrc(R2_URL + playlist[currentIdx]);
         }
 
-        // Funzione per lanciare la pubblicità (VAST)
-        function triggerAd() {
-            // Apriamo il tag VAST in una nuova scheda come "fallback" se il player non lo carica
-            window.open(VAST_TAG, '_blank');
+        function prevVid() {
+            currentIdx = (currentIdx - 1 + playlist.length) % playlist.length;
+            myFP.setSrc(R2_URL + playlist[currentIdx]);
         }
-
-        function enableAudio() { 
-            triggerAd(); // Lancia Ad al click
-            player.muted = false; 
-            document.getElementById('unmuteBtn').style.display = 'none'; 
-        }
-
-        function stopVideo() { 
-            triggerAd();
-            player.paused ? player.play() : player.pause(); 
-        }
-
-        function nextVideo() { 
-            triggerAd();
-            currentVideoIndex = (currentVideoIndex + 1) % playlist.length; 
-            loadVideo(currentVideoIndex); 
-        }
-
-        function prevVideo() { 
-            triggerAd();
-            currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length; 
-            loadVideo(currentVideoIndex); 
-        }
-
-        player.onended = nextVideo;
-        loadVideo(currentVideoIndex);
 
         // Formspree
         document.getElementById('dedalo-form').onsubmit = async (e) => {
             e.preventDefault();
-            triggerAd();
-            const btn = document.getElementById('submit-btn');
-            btn.innerText = "Processing...";
-            const response = await fetch(e.target.action, {
+            await fetch(e.target.action, {
                 method: 'POST',
                 body: new FormData(e.target),
                 headers: { 'Accept': 'application/json' }
             });
-            if (response.ok) {
-                document.getElementById('form-content').style.display = 'none';
-                document.getElementById('success-msg').style.display = 'block';
-            }
+            document.getElementById('form-content').style.display = 'none';
+            document.getElementById('success-msg').style.display = 'block';
         };
     </script>
 </body>
