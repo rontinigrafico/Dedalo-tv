@@ -4,161 +4,546 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>DEDALO TV</title>
-    
+
+    <!-- AdCash display/popunder tag (separato dal VAST) -->
     <script type="text/javascript" src="//acp.adcash.com/script/aclib.js"></script>
     <script type="text/javascript">
         aclib.runAutoTag({ zoneId: 'hiimtav9sf' });
     </script>
 
-    <script type="text/javascript" src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
-    
+    <!-- Google IMA SDK -->
+    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
     <style>
-        :root { --neon: #ff0055; --bg: #000; --panel: #0a0a0a; --gray: #444; --light-gray: #888; }
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
-        .wrapper { width: 100%; max-width: 420px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        
-        header { text-align: center; margin-bottom: 25px; width: 100%; }
-        .logo-img { width: 140px; height: auto; filter: drop-shadow(0 0 10px rgba(255,0,85,0.3)); }
-        .brand { font-size: 9px; letter-spacing: 5px; color: var(--light-gray); text-transform: uppercase; margin-top: 5px; }
+        :root {
+            --neon: #ff0055;
+            --neon-dim: rgba(255,0,85,0.15);
+            --bg: #050505;
+            --panel: #0d0d0d;
+            --border: #1a1a1a;
+            --gray: #555;
+            --light-gray: #888;
+        }
 
-        /* Container Player Video */
-        .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; aspect-ratio: 16/9; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 1; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Container Adcash - pointer-events:none di base per non bloccare i click */
-        #adContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-        .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; border-radius: 0 0 20px 20px; margin-top: -20px; position: relative; z-index: 5; }
-        .video-title { font-size: 14px; font-weight: bold; margin-top: 4px; color: #fff; text-align: center; }
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        /* UNMUTE ESTERNO - Z-index alto per essere sempre sopra */
-        .unmute-box { width: 100%; margin: 20px 0; display: flex; justify-content: center; position: relative; z-index: 20; }
-        #extUnmuteBtn { background: var(--neon); color: #fff; border: none; padding: 15px 30px; border-radius: 50px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 20px rgba(255,0,85,0.6); width: 100%; max-width: 300px; }
+        /* Subtle grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.35;
+        }
 
-        /* Icon Bar - Assicuriamo che sia sopra ogni altro elemento invisibile */
-        .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; position: relative; z-index: 25; }
-        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; min-width: 60px; }
-        .icon-btn span { font-size: 20px; pointer-events: none; }
-        .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; pointer-events: none; }
-        
-        #likeBtn.liked span { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+        .wrapper {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px 15px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        .form-box { width: 100%; margin-top: 25px; padding: 25px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; position: relative; z-index: 20; }
-        input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; margin-bottom: 10px; border-radius: 10px; }
-        .sub-btn { width: 100%; background: var(--neon); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 12px; }
-        
-        footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; width: 100%; }
+        /* ── HEADER ── */
+        header {
+            text-align: center;
+            margin-bottom: 22px;
+            width: 100%;
+            animation: fadeDown 0.6s ease both;
+        }
+
+        .logo-img {
+            width: 130px;
+            height: auto;
+            filter: drop-shadow(0 0 14px rgba(255,0,85,0.4));
+        }
+
+        .brand {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 9px;
+            font-weight: 300;
+            letter-spacing: 6px;
+            color: var(--light-gray);
+            text-transform: uppercase;
+            margin-top: 6px;
+        }
+
+        /* ── VIDEO CONTAINER ── */
+        .video-wrap {
+            width: 100%;
+            position: relative;
+            animation: fadeUp 0.6s 0.1s ease both;
+        }
+
+        .video-container {
+            width: 100%;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            position: relative;
+            aspect-ratio: 16/9;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,0,85,0.05);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* IMA ad container - sopra il video ma inizialmente non intercetta click */
+        #adContainer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 10;
+            pointer-events: none; /* attivato solo dopo unmute */
+        }
+
+        /* ── INFO BAR ── */
+        .info-bar {
+            width: calc(100% - 2px);
+            margin: 0 1px;
+            padding: 12px 16px 16px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 14px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .track-info { flex: 1; }
+
+        .video-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 17px;
+            letter-spacing: 1px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-meta {
+            font-size: 10px;
+            color: var(--light-gray);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* Live badge */
+        .live-badge {
+            background: var(--neon);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            animation: pulseBadge 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseBadge {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ── UNMUTE BUTTON ── */
+        .unmute-box {
+            width: 100%;
+            margin: 18px 0 6px;
+            display: flex;
+            justify-content: center;
+            position: relative;
+            z-index: 20;
+            animation: fadeUp 0.6s 0.2s ease both;
+        }
+
+        #extUnmuteBtn {
+            background: var(--neon);
+            color: #fff;
+            border: none;
+            padding: 16px 28px;
+            border-radius: 100px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(255,0,85,0.5), 0 4px 15px rgba(0,0,0,0.4);
+            width: 100%;
+            max-width: 320px;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        #extUnmuteBtn:active {
+            transform: scale(0.97);
+            box-shadow: 0 0 15px rgba(255,0,85,0.3);
+        }
+
+        /* ── ICON BAR ── */
+        .icon-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 20px 10px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 25;
+            animation: fadeUp 0.6s 0.25s ease both;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+            min-width: 60px;
+            padding: 10px 5px;
+            border-radius: 12px;
+            transition: background 0.15s;
+        }
+
+        .icon-btn:active { background: rgba(255,255,255,0.05); }
+
+        .icon-btn .ico {
+            font-size: 22px;
+            line-height: 1;
+            pointer-events: none;
+            transition: color 0.2s, text-shadow 0.2s;
+        }
+
+        .icon-btn .lbl {
+            font-size: 8px;
+            font-weight: 500;
+            color: var(--light-gray);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            pointer-events: none;
+        }
+
+        #likeBtn.liked .ico {
+            color: var(--neon);
+            text-shadow: 0 0 12px var(--neon);
+        }
+
+        /* ── FORM BOX ── */
+        .form-box {
+            width: 100%;
+            margin-top: 20px;
+            padding: 24px 20px;
+            background: var(--panel);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+            z-index: 20;
+            animation: fadeUp 0.6s 0.3s ease both;
+        }
+
+        .form-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .form-sub {
+            font-size: 11px;
+            color: var(--light-gray);
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            color: #fff;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: rgba(255,0,85,0.4);
+            background: rgba(255,0,85,0.03);
+            outline: none;
+        }
+
+        input::placeholder { color: var(--gray); }
+
+        .sub-btn {
+            width: 100%;
+            background: var(--neon);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 2.5px;
+            margin-top: 4px;
+            transition: opacity 0.15s, transform 0.1s;
+        }
+
+        .sub-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+        /* ── FOOTER ── */
+        footer {
+            padding: 36px 0 10px;
+            text-align: center;
+            opacity: 0.12;
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            width: 100%;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body onload="requestPreroll()">
 
-    <div class="wrapper">
-        <header>
-            <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" class="logo-img">
-            <div class="brand">Music Distribution</div>
-        </header>
+<body>
+<div class="wrapper">
 
+    <header>
+        <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" class="logo-img" alt="DEDALO">
+        <div class="brand">Music Distribution</div>
+    </header>
+
+    <div class="video-wrap">
         <div class="video-container">
             <video id="mainPlayer" playsinline muted loop>
                 <source src="https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/Red%20Think%20-%20Badret%20-%20Official%20video.mp4" type="video/mp4">
             </video>
             <div id="adContainer"></div>
         </div>
-        
         <div class="info-bar">
-            <div id="videoTitle" class="video-title">BADRET - Red Think</div>
+            <div class="track-info">
+                <div id="videoTitle" class="video-title">BADRET — Red Think</div>
+                <div class="track-meta">Official Video</div>
+            </div>
+            <div class="live-badge">LIVE</div>
         </div>
-
-        <div class="unmute-box">
-            <button id="extUnmuteBtn" onclick="unmuteEverything()">🔇 TAP TO UNMUTE</button>
-        </div>
-
-        <div class="icon-bar">
-            <button class="icon-btn" id="likeBtn" onclick="handleLike()"><span>♡</span><label id="likeCounter">2384</label></button>
-            <button class="icon-btn" onclick="prevTrack()"><span>⏮</span><label>Back</label></button>
-            <button class="icon-btn" onclick="togglePlay()"><span>■/▶</span><label>Stop/Play</label></button>
-            <button class="icon-btn" onclick="nextTrack()"><span>⏭</span><label>Forward</label></button>
-        </div>
-
-        <div class="form-box">
-            <input type="text" placeholder="Nickname">
-            <input type="email" placeholder="Email Address">
-            <button class="sub-btn">Unlock HQ Pack</button>
-        </div>
-        <footer>DEDALO &copy; 2026</footer>
     </div>
 
-    <script>
-        const VAST_TAG = "https://adcash.com/video/select.php?r=11187574";
-        const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
-        const playlist = [
-            { file: "Red Think - Badret - Official video.mp4", title: "BADRET - Red Think" },
-            { file: "Future Voyage - Badret.mp4", title: "BADRET - Future Voyage" }
-        ];
-        
-        let currentIdx = 0;
-        const player = document.getElementById('mainPlayer');
-        let adsLoader, adsManager, adDisplayContainer;
+    <div class="unmute-box">
+        <button id="extUnmuteBtn" onclick="activateSound()">🔇 TAP TO UNMUTE</button>
+    </div>
 
-        function requestPreroll() {
-            adDisplayContainer = new google.ima.AdDisplayContainer(document.getElementById('adContainer'), player);
-            adsLoader = new google.ima.AdsLoader(adDisplayContainer);
-            
-            adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, (e) => {
-                adsManager = e.getAdsManager(player);
-                adsManager.init(640, 360, google.ima.ViewMode.NORMAL);
-                adsManager.start();
-            }, false);
+    <div class="icon-bar">
+        <button class="icon-btn" id="likeBtn" onclick="handleLike()">
+            <span class="ico">♡</span>
+            <span class="lbl" id="likeCounter">2384</span>
+        </button>
+        <button class="icon-btn" onclick="prevTrack()">
+            <span class="ico">⏮</span>
+            <span class="lbl">Back</span>
+        </button>
+        <button class="icon-btn" onclick="togglePlay()">
+            <span class="ico" id="playIco">⏸</span>
+            <span class="lbl">Play</span>
+        </button>
+        <button class="icon-btn" onclick="nextTrack()">
+            <span class="ico">⏭</span>
+            <span class="lbl">Next</span>
+        </button>
+    </div>
 
-            const adsRequest = new google.ima.AdsRequest();
-            adsRequest.adTagUrl = VAST_TAG;
-            adsLoader.requestAds(adsRequest);
+    <div class="form-box">
+        <div class="form-title">Unlock HQ Pack</div>
+        <div class="form-sub">Stems, Lossless & Exclusive Remixes</div>
+        <input type="text" placeholder="Nickname">
+        <input type="email" placeholder="Email Address">
+        <button class="sub-btn">🎵 Get Free Access</button>
+    </div>
+
+    <footer>DEDALO © 2026</footer>
+</div>
+
+<script>
+    /* ─── CONFIG ─── */
+    const VAST_TAG = "https://adcash.com/video/select.php?r=11187574";
+    const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
+
+    const playlist = [
+        { file: "Red Think - Badret - Official video.mp4",  title: "BADRET — Red Think" },
+        { file: "Future Voyage - Badret.mp4",               title: "BADRET — Future Voyage" }
+    ];
+
+    let currentIdx   = 0;
+    let soundActive  = false;
+    let adsLoader, adsManager, adDisplayContainer;
+
+    const player      = document.getElementById('mainPlayer');
+    const adContainer = document.getElementById('adContainer');
+
+    /* ─── STEP 1: Avvia il video MUTO in autoplay (come YouTube) ─── */
+    window.addEventListener('load', () => {
+        player.muted = true;
+        player.play().catch(() => {
+            // Se autoplay è bloccato del tutto, aspetta un tap
+            document.body.addEventListener('touchstart', () => player.play(), { once: true });
+        });
+
+        /* Prepara IMA loader (senza inizializzare il container ancora) */
+        adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, player);
+        adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+
+        adsLoader.addEventListener(
+            google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+            onAdsManagerLoaded, false
+        );
+        adsLoader.addEventListener(
+            google.ima.AdErrorEvent.Type.AD_ERROR,
+            onAdError, false
+        );
+    });
+
+    function onAdsManagerLoaded(e) {
+        adsManager = e.getAdsManager(player);
+
+        adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
+        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, () => {
+            // Quando la pubblicità finisce, riprende il video normale
+            player.play();
+        });
+
+        // Inizia l'annuncio SOLO se il suono è già stato attivato dall'utente
+        if (soundActive) {
+            startAd();
+        }
+    }
+
+    function onAdError(e) {
+        console.warn('IMA error:', e.getError());
+        if (adsManager) adsManager.destroy();
+        player.play();
+    }
+
+    function startAd() {
+        try {
+            adsManager.init(640, 360, google.ima.ViewMode.NORMAL);
+            adsManager.setVolume(1);
+            adsManager.start();
+        } catch (err) {
+            console.warn('adsManager.start error:', err);
             player.play();
         }
+    }
 
-        function unmuteEverything() {
-            player.muted = false;
-            if (adsManager) adsManager.setVolume(1);
-            document.getElementById('extUnmuteBtn').style.display = 'none';
-            document.getElementById('adContainer').style.pointerEvents = 'auto'; // Attiva click solo su pubblicità
-            adDisplayContainer.initialize();
+    /* ─── STEP 2: Al TAP utente — inizializza tutto e richiedi l'ad ─── */
+    function activateSound() {
+        if (soundActive) return;
+        soundActive = true;
+
+        // DEVE succedere dentro un gesto utente:
+        adDisplayContainer.initialize();          // 1. inizializza il container IMA
+        adContainer.style.pointerEvents = 'auto'; // 2. attiva i click sull'ad
+
+        player.muted = false;
+        player.volume = 1;
+
+        // 3. Richiedi il preroll VAST
+        const req = new google.ima.AdsRequest();
+        req.adTagUrl = VAST_TAG;
+        req.linearAdSlotWidth  = 640;
+        req.linearAdSlotHeight = 360;
+        adsLoader.requestAds(req);
+
+        // Se adsManager è già pronto (raro ma possibile), avvia subito
+        if (adsManager) startAd();
+
+        document.getElementById('extUnmuteBtn').style.display = 'none';
+    }
+
+    /* ─── PLAYER CONTROLS ─── */
+    function handleLike() {
+        const counter = document.getElementById('likeCounter');
+        const btn     = document.getElementById('likeBtn');
+        const ico     = btn.querySelector('.ico');
+        if (btn.classList.contains('liked')) {
+            counter.textContent = parseInt(counter.textContent) - 1;
+            ico.textContent = '♡';
+        } else {
+            counter.textContent = parseInt(counter.textContent) + 1;
+            ico.textContent = '♥';
         }
+        btn.classList.toggle('liked');
+    }
 
-        function handleLike() {
-            let counter = document.getElementById('likeCounter');
-            let btn = document.getElementById('likeBtn');
-            if (btn.classList.contains('liked')) {
-                counter.innerText = parseInt(counter.innerText) - 1;
-                btn.querySelector('span').innerText = '♡';
-            } else {
-                counter.innerText = parseInt(counter.innerText) + 1;
-                btn.querySelector('span').innerText = '♥';
-            }
-            btn.classList.toggle('liked');
-        }
-
-        function togglePlay() { player.paused ? player.play() : player.pause(); }
-        
-        function updateTrack(idx) {
-            currentIdx = idx;
-            player.src = R2_URL + encodeURIComponent(playlist[currentIdx].file);
-            document.getElementById('videoTitle').innerText = playlist[currentIdx].title;
-            player.load();
+    function togglePlay() {
+        const ico = document.getElementById('playIco');
+        if (player.paused) {
             player.play();
+            ico.textContent = '⏸';
+        } else {
+            player.pause();
+            ico.textContent = '▶';
         }
+    }
 
-        function nextTrack() {
-            let nextIdx = (currentIdx + 1) % playlist.length;
-            updateTrack(nextIdx);
-        }
+    function updateTrack(idx) {
+        currentIdx = idx;
+        const t = playlist[currentIdx];
+        player.src = R2_URL + encodeURIComponent(t.file);
+        document.getElementById('videoTitle').textContent = t.title;
+        player.load();
+        player.play();
+        document.getElementById('playIco').textContent = '⏸';
+    }
 
-        function prevTrack() {
-            let prevIdx = (currentIdx - 1 + playlist.length) % playlist.length;
-            updateTrack(prevIdx);
-        }
+    function nextTrack() { updateTrack((currentIdx + 1) % playlist.length); }
+    function prevTrack() { updateTrack((currentIdx - 1 + playlist.length) % playlist.length); }
 
-        player.onended = nextTrack;
-    </script>
+    player.addEventListener('ended', nextTrack);
+</script>
 </body>
 </html>
