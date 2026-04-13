@@ -112,7 +112,18 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 10;
-            pointer-events: none; /* attivato solo dopo unmute */
+            pointer-events: none;
+            background: transparent;
+        }
+
+        /* Forza visibilità elementi IMA */
+        #adContainer * { visibility: visible !important; }
+        #adContainer video { 
+            position: absolute;
+            top: 0; left: 0;
+            width: 100% !important; 
+            height: 100% !important;
+            object-fit: contain;
         }
 
         /* ── INFO BAR ── */
@@ -442,16 +453,39 @@
     function onAdsManagerLoaded(e) {
         adsManager = e.getAdsManager(player);
         adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
-        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, () => { player.muted = false; player.play(); });
+
+        // Quando tutte le ads finiscono → riprendi video con audio
+        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, () => {
+            adContainer.style.pointerEvents = 'none';
+            unmuteBtn.style.display = 'none';
+            player.muted = false;
+            player.play();
+        });
+
+        // Quando l'utente clicca sull'ad e torna → riprendi video
+        adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, () => {
+            adContainer.style.pointerEvents = 'none';
+            unmuteBtn.style.display = 'none';
+            player.muted = false;
+            player.play();
+        });
+
+        // Quando l'ad parte → mostra unmute
         adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
-            // Mostra pulsante unmute sopra il video durante il preroll
             unmuteBtn.style.display = 'flex';
+        });
+
+        // Quando l'ad è completata → nascondi unmute
+        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, () => {
+            unmuteBtn.style.display = 'none';
         });
 
         adContainer.style.pointerEvents = 'auto';
 
         try {
-            adsManager.init(640, 360, google.ima.ViewMode.NORMAL);
+            // Usa le dimensioni reali del container per evitare schermo nero
+            const rect = player.getBoundingClientRect();
+            adsManager.init(rect.width || 640, rect.height || 360, google.ima.ViewMode.NORMAL);
             adsManager.setVolume(0); // parte muto
             adsManager.start();
         } catch(err) {
