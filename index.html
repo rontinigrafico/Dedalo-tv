@@ -27,7 +27,7 @@
         .video-container { width: 100%; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #111; position: relative; aspect-ratio: 16/9; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         video { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Contenitore Adcash VAST sopra il video */
+        /* Container Adcash sopra il video */
         #adContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; }
 
         .info-bar { padding: 15px; background: var(--panel); border-bottom: 1px solid #111; width: 100%; border-radius: 0 0 20px 20px; margin-top: -20px; position: relative; z-index: 5; }
@@ -38,9 +38,8 @@
 
         .icon-bar { width: 100%; display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 1px solid #111; margin-bottom: 10px; }
         .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; min-width: 60px; }
-        .icon-btn span { font-size: 20px; }
+        .icon-btn span { font-size: 20px; color: #fff; }
         .icon-btn label { font-size: 8px; color: var(--light-gray); text-transform: uppercase; }
-        
         #likeBtn.liked span { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
 
         .form-box { width: 100%; margin-top: 25px; padding: 25px; background: var(--panel); border-radius: 15px; border: 1px solid #111; text-align: center; }
@@ -50,7 +49,7 @@
         footer { padding: 40px 0; text-align: center; opacity: 0.15; font-size: 10px; width: 100%; }
     </style>
 </head>
-<body onload="requestPreroll()">
+<body onload="startVast()">
 
     <div class="wrapper">
         <header>
@@ -74,10 +73,7 @@
         </div>
 
         <div class="icon-bar">
-            <button class="icon-btn" id="likeBtn" onclick="handleLike()">
-                <span>♡</span>
-                <label id="likeCounter">2384</label>
-            </button>
+            <button class="icon-btn" id="likeBtn" onclick="handleLike()"><span>♡</span><label id="likeCounter">2384</label></button>
             <button class="icon-btn" onclick="prevTrack()"><span>⏮</span><label>Back</label></button>
             <button class="icon-btn" onclick="togglePlay()"><span>■/▶</span><label>Stop/Play</label></button>
             <button class="icon-btn" onclick="nextTrack()"><span>⏭</span><label>Forward</label></button>
@@ -93,31 +89,24 @@
 
     <script>
         const VAST_TAG = "https://adcash.com/video/select.php?r=11187574";
-        const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
-        const playlist = [
-            "Red%20Think%20-%20Badret%20-%20Official%20video.mp4",
-            "Future%20Voyage%20-%20Badret.mp4"
-        ];
-        
-        let currentIdx = 0;
         const player = document.getElementById('mainPlayer');
         let adsLoader, adsManager, adDisplayContainer;
 
-        // --- CARICAMENTO IMMEDIATO (YT STYLE) ---
-        function requestPreroll() {
+        // --- CARICAMENTO IMMEDIATO ---
+        function startVast() {
             adDisplayContainer = new google.ima.AdDisplayContainer(document.getElementById('adContainer'), player);
             adsLoader = new google.ima.AdsLoader(adDisplayContainer);
             
             adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, (e) => {
                 adsManager = e.getAdsManager(player);
                 adsManager.init(640, 360, google.ima.ViewMode.NORMAL);
-                adsManager.start(); // Parte muto per bypassare i blocchi browser
+                adsManager.start(); 
             }, false);
 
             const adsRequest = new google.ima.AdsRequest();
             adsRequest.adTagUrl = VAST_TAG;
             adsLoader.requestAds(adsRequest);
-            player.play(); // Avvia il video principale in background (muto)
+            player.play(); 
         }
 
         function unmuteEverything() {
@@ -125,7 +114,7 @@
             if (adsManager) adsManager.setVolume(1);
             document.getElementById('extUnmuteBtn').style.display = 'none';
             document.getElementById('adContainer').style.pointerEvents = 'auto';
-            adDisplayContainer.initialize(); // Sblocca l'interazione audio per il browser
+            adDisplayContainer.initialize(); 
         }
 
         function handleLike() {
@@ -142,18 +131,8 @@
         }
 
         function togglePlay() { player.paused ? player.play() : player.pause(); }
-        
-        function nextTrack() {
-            currentIdx = (currentIdx + 1) % playlist.length;
-            player.src = R2_URL + playlist[currentIdx];
-            player.play();
-        }
-
-        function prevTrack() {
-            currentIdx = (currentIdx - 1 + playlist.length) % playlist.length;
-            player.src = R2_URL + playlist[currentIdx];
-            player.play();
-        }
+        function nextTrack() { /* logica skip */ }
+        function prevTrack() { /* logica skip */ }
     </script>
 </body>
 </html>
