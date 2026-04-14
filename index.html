@@ -7,10 +7,8 @@
     <meta name="c155c5e1fbceea1b637c75cd4afa6a9d87d3f9d6" content="c155c5e1fbceea1b637c75cd4afa6a9d87d3f9d6" />
     <meta name="6a97888e-site-verification" content="e80774ae86abe9aba015523c95e6a8b2" />
 
-    <!-- Google IMA SDK -->
     <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -354,7 +352,6 @@
                 <source src="https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/Red%20Think%20-%20Badret%20-%20Official%20video.mp4" type="video/mp4">
             </video>
             <div id="adContainer"></div>
-            <!-- Unmute overlay come YouTube -->
             <div class="unmute-box">
                 <button id="extUnmuteBtn" onclick="activateSound()">🔇 Tap to unmute</button>
             </div>
@@ -401,8 +398,6 @@
 <script>
     // ExoClick VAST In-Stream
     const VAST_TAG = "https://s.magsrv.com/v1/vast.php?idzone=5900810";
-    // HilltopAds (disattivato)
-    // const VAST_TAG = "https://baggymaintenance.com/dymKF/z.d/GsNLvKZXG/Uz/_eomf9cuMZiUUlRk/PYTeYd5UNXThQ_wIMJDYE/tiNmjhko1PNdDpALwhNNShZxsuaEWA1Sp-d/Dd0cxP";
     const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
 
     const playlist = [
@@ -413,15 +408,14 @@
     let currentIdx = 0;
     let adsLoader, adsManager, adDisplayContainer;
     let imaReady   = false;
-    let muted      = true;
+    let muted      = true; // Stato del volume globale
 
     const player      = document.getElementById('mainPlayer');
     const adContainer = document.getElementById('adContainer');
     const unmuteBtn   = document.getElementById('extUnmuteBtn');
 
-    /* ── INIT IMA una volta sola al load ── */
+    /* ── INIT IMA al load ── */
     window.addEventListener('load', () => {
-        // Il container IMA va inizializzato subito, PRIMA della richiesta
         adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, player);
         adDisplayContainer.initialize();
 
@@ -430,9 +424,15 @@
         adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError, false);
 
         player.muted = true;
-        player.play().catch(() => {});
 
-        requestPreroll();
+        // Gestione corretta dell'autoplay iniziale
+        let playPromise = player.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => { /* Ignora se il browser blocca l'autoplay istantaneo */ });
+        }
+
+        // Leggero delay per garantire che l'interfaccia abbia dimensioni valide prima della richiesta
+        setTimeout(requestPreroll, 150);
     });
 
     /* ── RICHIEDI PREROLL ── */
@@ -442,10 +442,12 @@
 
         const req = new google.ima.AdsRequest();
         req.adTagUrl = VAST_TAG;
-        req.linearAdSlotWidth  = player.offsetWidth  || 640;
-        req.linearAdSlotHeight = player.offsetHeight || 360;
+        // Fallback di sicurezza se la larghezza/altezza non è ancora calcolata dal browser
+        req.linearAdSlotWidth  = player.offsetWidth > 0 ? player.offsetWidth : 640;
+        req.linearAdSlotHeight = player.offsetHeight > 0 ? player.offsetHeight : 360;
         req.setAdWillAutoPlay(true);
         req.setAdWillPlayMuted(true);
+        
         adsLoader.requestAds(req);
     }
 
@@ -456,7 +458,6 @@
         adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
 
         adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
-            // Pausa il video principale mentre gira l'ad
             player.pause();
             adContainer.style.pointerEvents = 'auto';
             unmuteBtn.style.display = 'flex';
@@ -467,10 +468,13 @@
         adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, resumeContent);
         adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, resumeContent);
 
-        // Avvia subito
         try {
-            adsManager.init(player.offsetWidth || 640, player.offsetHeight || 360, google.ima.ViewMode.NORMAL);
-            adsManager.setVolume(0);
+            adsManager.init(
+                player.offsetWidth > 0 ? player.offsetWidth : 640, 
+                player.offsetHeight > 0 ? player.offsetHeight : 360, 
+                google.ima.ViewMode.NORMAL
+            );
+            adsManager.setVolume(muted ? 0 : 1);
             adsManager.start();
         } catch(err) {
             console.warn('IMA start error:', err);
@@ -478,12 +482,24 @@
         }
     }
 
+    /* ── RIPRESA VIDEO PRINCIPALE CORRETTA ── */
     function resumeContent() {
         adContainer.style.pointerEvents = 'none';
         unmuteBtn.style.display = 'none';
-        muted = false;
-        player.muted = false;
-        player.play();
+        
+        // Imposta il player allo stato scelto dall'utente, non forzare a false
+        player.muted = muted; 
+        
+        let playPromise = player.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.warn('Autoplay bloccato. Avvio silenziato per non bloccare il player.', error);
+                // Fallback: se il browser si rifiuta, forziamo il mute e facciamo partire il video
+                muted = true;
+                player.muted = true;
+                player.play().catch(e => console.error('Errore irreversibile play:', e));
+            });
+        }
     }
 
     function onAdError(e) {
@@ -528,7 +544,6 @@
         document.getElementById('videoTitle').textContent = t.title;
         document.getElementById('playIco').textContent = '⏸';
         player.load();
-        // Mostra preroll ad ogni cambio traccia
         requestPreroll();
     }
 
