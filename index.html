@@ -15,8 +15,6 @@
         })(window, document, "clarity", "script", "wc3el9wrd5");
     </script>
 
-    <script src="https://quge5.com/88/tag.min.js" data-zone="229076" async data-cfasync="false"></script>
-
     <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -254,7 +252,7 @@
             text-shadow: 0 0 12px var(--neon);
         }
 
-        /* ── FORM BOX AGGIORNATO ── */
+        /* ── FORM BOX ── */
         .form-box {
             width: 100%;
             margin-top: 20px;
@@ -399,9 +397,9 @@
         <button class="sub-btn" id="startDownloadBtn" onclick="revealEmailForm()">🎵 Download Free</button>
         
         <div id="hiddenEmailForm" style="display: none; animation: fadeUp 0.4s ease;">
-            <input type="text" placeholder="Nickname">
-            <input type="email" placeholder="Email Address">
-            <button class="sub-btn">✉️ Get Access Now</button>
+            <input type="text" id="userNick" placeholder="Nickname">
+            <input type="email" id="userEmail" placeholder="Email Address">
+            <button class="sub-btn" id="finalSubmitBtn" onclick="submitAndMonetize()">✉️ Get Access Now</button>
         </div>
     </div>
 
@@ -409,8 +407,8 @@
 </div>
 
 <script>
-    // NUOVO TAG VAST DIRECT LINK
-    const VAST_TAG = "https://omg10.com/4/10867749";
+    // Nessun VAST caricato per ora: il video parte subito
+    const VAST_TAG = "";
     
     const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
 
@@ -435,12 +433,19 @@
         adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, onAdsManagerLoaded, false);
         adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError, false);
         player.muted = true;
+        
         let playPromise = player.play();
         if (playPromise !== undefined) { playPromise.catch(() => {}); }
         setTimeout(requestPreroll, 150);
     });
 
     function requestPreroll() {
+        if (!VAST_TAG || VAST_TAG.trim() === "") {
+            // Se non c'è il tag VAST salta direttamente al video musicale
+            resumeContent();
+            return;
+        }
+
         if (adsManager) { adsManager.destroy(); adsManager = null; }
         imaReady = false;
         const req = new google.ima.AdsRequest();
@@ -502,6 +507,26 @@
         document.getElementById('hiddenEmailForm').style.display = 'block';
     }
 
+    /* ── LOGICA MONETIZZAZIONE DIRECT LINK ── */
+    function submitAndMonetize() {
+        const emailInput = document.getElementById('userEmail').value;
+        const btn = document.getElementById('finalSubmitBtn');
+        
+        if(emailInput === "" || !emailInput.includes("@")) {
+            alert("Please enter a valid email address!");
+            return;
+        }
+
+        // Cambia l'aspetto del bottone per feedback all'utente
+        btn.style.background = "#00cc66"; 
+        btn.innerHTML = "✅ Check your inbox!";
+        btn.disabled = true;
+
+        // Apre il Direct Link di Monetag in una nuova scheda
+        window.open("https://omg10.com/4/10867749", "_blank");
+    }
+
+    /* ── PLAYER CONTROLS ── */
     function handleLike() {
         const counter = document.getElementById('likeCounter');
         const btn     = document.getElementById('likeBtn');
@@ -527,6 +552,7 @@
         const t = playlist[currentIdx];
         player.src = R2_URL + encodeURIComponent(t.file);
         document.getElementById('videoTitle').textContent = t.title;
+        document.getElementById('playIco').textContent = '⏸';
         player.load();
         requestPreroll();
     }
@@ -536,5 +562,13 @@
 
     player.addEventListener('ended', nextTrack);
 </script>
+
+<script>
+    (function(s){
+        s.dataset.zone='10881065';
+        s.src='https://al5sm.com/tag.min.js';
+    })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
+</script>
+
 </body>
 </html>
