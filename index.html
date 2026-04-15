@@ -4,18 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>DEDALO TV</title>
-
+    
     <meta name="clckd" content="85003d2ef9da9dd4105a5304988da328" />
 
-    <!-- 1. IMA SDK — PRIMO, prima di tutto -->
-    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
-
-    <!-- 2. Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-
-    <!-- 3. Microsoft Clarity — DOPO IMA, async/defer per non bloccare -->
     <script type="text/javascript">
         (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -23,6 +14,14 @@
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         })(window, document, "clarity", "script", "wc3el9wrd5");
     </script>
+
+    <script src="https://quge5.com/88/tag.min.js" data-zone="229076" async data-cfasync="false"></script>
+
+    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -47,6 +46,7 @@
             overflow-x: hidden;
         }
 
+        /* Subtle grain overlay */
         body::before {
             content: '';
             position: fixed;
@@ -66,6 +66,7 @@
             align-items: center;
         }
 
+        /* ── HEADER ── */
         header {
             text-align: center;
             margin-bottom: 22px;
@@ -89,6 +90,7 @@
             margin-top: 6px;
         }
 
+        /* ── VIDEO CONTAINER ── */
         .video-wrap {
             width: 100%;
             position: relative;
@@ -121,6 +123,7 @@
             pointer-events: none;
         }
 
+        /* ── INFO BAR ── */
         .info-bar {
             width: calc(100% - 2px);
             margin: 0 1px;
@@ -172,6 +175,7 @@
             50% { opacity: 0.5; }
         }
 
+        /* ── UNMUTE OVERLAY ── */
         .unmute-box {
             position: absolute;
             bottom: 12px;
@@ -199,6 +203,7 @@
 
         #extUnmuteBtn:active { background: rgba(255,0,85,0.7); }
 
+        /* ── ICON BAR ── */
         .icon-bar {
             width: 100%;
             display: flex;
@@ -249,6 +254,7 @@
             text-shadow: 0 0 12px var(--neon);
         }
 
+        /* ── FORM BOX AGGIORNATO ── */
         .form-box {
             width: 100%;
             margin-top: 20px;
@@ -295,8 +301,6 @@
             outline: none;
         }
 
-        input::placeholder { color: var(--gray); }
-
         .sub-btn {
             width: 100%;
             background: var(--neon);
@@ -310,12 +314,16 @@
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 2.5px;
-            margin-top: 4px;
             transition: opacity 0.15s, transform 0.1s;
         }
 
         .sub-btn:active { opacity: 0.85; transform: scale(0.98); }
 
+        #hiddenEmailForm {
+            margin-top: 15px;
+        }
+
+        /* ── FOOTER ── */
         footer {
             padding: 36px 0 10px;
             text-align: center;
@@ -387,16 +395,23 @@
     <div class="form-box">
         <div class="form-title">Unlock HQ Pack</div>
         <div class="form-sub">Stems, Lossless & Exclusive Remixes</div>
-        <input type="text" placeholder="Nickname">
-        <input type="email" placeholder="Email Address">
-        <button class="sub-btn">🎵 Get Free Access</button>
+        
+        <button class="sub-btn" id="startDownloadBtn" onclick="revealEmailForm()">🎵 Download Free</button>
+        
+        <div id="hiddenEmailForm" style="display: none; animation: fadeUp 0.4s ease;">
+            <input type="text" placeholder="Nickname">
+            <input type="email" placeholder="Email Address">
+            <button class="sub-btn">✉️ Get Access Now</button>
+        </div>
     </div>
 
     <footer>DEDALO © 2026</footer>
 </div>
 
 <script>
-    const VAST_TAG = "https://youradexchange.com/video/select.php?r=11187574";
+    // NUOVO TAG VAST DIRECT LINK
+    const VAST_TAG = "https://omg10.com/4/10867749";
+    
     const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
 
     const playlist = [
@@ -404,168 +419,76 @@
         { file: "Future Voyage - Badret.mp4",               title: "BADRET — Future Voyage" }
     ];
 
-    let currentIdx     = 0;
-    let adsLoader      = null;
-    let adsManager     = null;
-    let adDisplayContainer = null;
-    let muted          = true;
-    let imaInitialized = false;
+    let currentIdx = 0;
+    let adsLoader, adsManager, adDisplayContainer;
+    let imaReady   = false;
+    let muted      = true;
 
     const player      = document.getElementById('mainPlayer');
     const adContainer = document.getElementById('adContainer');
     const unmuteBtn   = document.getElementById('extUnmuteBtn');
 
-    /* ─────────────────────────────────────────
-       ATTENDI IMA SDK con polling attivo
-       (Clarity async non deve bloccare IMA)
-    ───────────────────────────────────────── */
-    function waitForIMA(callback, maxAttempts, attempt) {
-        maxAttempts = maxAttempts || 30;
-        attempt     = attempt     || 0;
-
-        if (typeof google !== 'undefined' && google.ima) {
-            callback();
-        } else if (attempt < maxAttempts) {
-            setTimeout(function() {
-                waitForIMA(callback, maxAttempts, attempt + 1);
-            }, 200);
-        } else {
-            console.warn('IMA SDK non disponibile dopo ' + (maxAttempts * 200) + 'ms — fallback a content.');
-            resumeContent();
-        }
-    }
-
-    /* ─────────────────────────────────────────
-       INIT
-    ───────────────────────────────────────── */
-    window.addEventListener('load', function() {
-        // Avvia il video silenzioso subito
-        player.muted = true;
-        player.play().catch(function() {});
-
-        // Aspetta IMA prima di fare qualsiasi cosa con gli ad
-        waitForIMA(function() {
-            initAdDisplayContainer();
-            requestPreroll();
-        });
-    });
-
-    function initAdDisplayContainer() {
-        if (imaInitialized) return;
+    window.addEventListener('load', () => {
         adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, player);
         adDisplayContainer.initialize();
-
         adsLoader = new google.ima.AdsLoader(adDisplayContainer);
-        adsLoader.addEventListener(
-            google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-            onAdsManagerLoaded,
-            false
-        );
-        adsLoader.addEventListener(
-            google.ima.AdErrorEvent.Type.AD_ERROR,
-            onAdError,
-            false
-        );
+        adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, onAdsManagerLoaded, false);
+        adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError, false);
+        player.muted = true;
+        let playPromise = player.play();
+        if (playPromise !== undefined) { playPromise.catch(() => {}); }
+        setTimeout(requestPreroll, 150);
+    });
 
-        imaInitialized = true;
-    }
-
-    /* ─────────────────────────────────────────
-       RICHIEDI PREROLL
-    ───────────────────────────────────────── */
     function requestPreroll() {
-        if (!imaInitialized) return;
-
-        // Distruggi eventuali adsManager precedenti
-        if (adsManager) {
-            adsManager.destroy();
-            adsManager = null;
-        }
-
-        var w = player.offsetWidth  > 0 ? player.offsetWidth  : 640;
-        var h = player.offsetHeight > 0 ? player.offsetHeight : 360;
-
-        var req = new google.ima.AdsRequest();
-        req.adTagUrl             = VAST_TAG;
-        req.linearAdSlotWidth    = w;
-        req.linearAdSlotHeight   = h;
+        if (adsManager) { adsManager.destroy(); adsManager = null; }
+        imaReady = false;
+        const req = new google.ima.AdsRequest();
+        req.adTagUrl = VAST_TAG;
+        req.linearAdSlotWidth  = player.offsetWidth > 0 ? player.offsetWidth : 640;
+        req.linearAdSlotHeight = player.offsetHeight > 0 ? player.offsetHeight : 360;
         req.setAdWillAutoPlay(true);
         req.setAdWillPlayMuted(true);
-
-        try {
-            adsLoader.requestAds(req);
-        } catch(e) {
-            console.warn('requestAds error:', e);
-            resumeContent();
-        }
+        adsLoader.requestAds(req);
     }
 
-    /* ─────────────────────────────────────────
-       ADS MANAGER LOADED
-    ───────────────────────────────────────── */
     function onAdsManagerLoaded(e) {
         adsManager = e.getAdsManager(player);
-
+        imaReady   = true;
         adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
-        adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, onAdStarted);
-        adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED,             resumeContent);
-        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE,            resumeContent);
-        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED,   resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
+            player.pause();
+            adContainer.style.pointerEvents = 'auto';
+            if (muted) { unmuteBtn.style.display = 'flex'; }
+        });
+        adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED, resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, resumeContent);
         adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, resumeContent);
-
-        var w = player.offsetWidth  > 0 ? player.offsetWidth  : 640;
-        var h = player.offsetHeight > 0 ? player.offsetHeight : 360;
-
         try {
-            adsManager.init(w, h, google.ima.ViewMode.NORMAL);
-            adsManager.setVolume(0); // Sempre muto all'inizio
+            adsManager.init(player.offsetWidth || 640, player.offsetHeight || 360, google.ima.ViewMode.NORMAL);
+            adsManager.setVolume(muted ? 0 : 1);
             adsManager.start();
-        } catch(err) {
-            console.warn('adsManager.start() error:', err);
-            resumeContent();
-        }
+        } catch(err) { resumeContent(); }
     }
 
-    function onAdStarted() {
-        player.pause();
-        adContainer.style.pointerEvents = 'auto';
-        unmuteBtn.style.display = 'flex'; // Mostra sempre unmute durante l'ad
-    }
-
-    /* ─────────────────────────────────────────
-       RIPRESA CONTENUTO
-    ───────────────────────────────────────── */
     function resumeContent() {
         adContainer.style.pointerEvents = 'none';
         unmuteBtn.style.display = muted ? 'flex' : 'none';
-        player.muted = muted;
-
-        player.play().catch(function(error) {
-            console.warn('Autoplay bloccato, forzo mute:', error);
+        player.muted = muted; 
+        player.play().catch(() => {
             muted = true;
             player.muted = true;
             unmuteBtn.style.display = 'flex';
-            player.play().catch(function(e) {
-                console.error('Play definitivamente bloccato:', e);
-            });
+            player.play();
         });
     }
 
-    /* ─────────────────────────────────────────
-       AD ERROR
-    ───────────────────────────────────────── */
     function onAdError(e) {
-        console.warn('IMA Ad Error:', e.getError ? e.getError() : e);
-        if (adsManager) {
-            adsManager.destroy();
-            adsManager = null;
-        }
+        if (adsManager) adsManager.destroy();
         resumeContent();
     }
 
-    /* ─────────────────────────────────────────
-       UNMUTE
-    ───────────────────────────────────────── */
     function activateSound() {
         muted = false;
         player.muted = false;
@@ -573,13 +496,16 @@
         unmuteBtn.style.display = 'none';
     }
 
-    /* ─────────────────────────────────────────
-       PLAYER CONTROLS
-    ───────────────────────────────────────── */
+    /* ── LOGICA MOSTRA MODULO EMAIL ── */
+    function revealEmailForm() {
+        document.getElementById('startDownloadBtn').style.display = 'none';
+        document.getElementById('hiddenEmailForm').style.display = 'block';
+    }
+
     function handleLike() {
-        var counter = document.getElementById('likeCounter');
-        var btn     = document.getElementById('likeBtn');
-        var ico     = btn.querySelector('.ico');
+        const counter = document.getElementById('likeCounter');
+        const btn     = document.getElementById('likeBtn');
+        const ico     = btn.querySelector('.ico');
         if (btn.classList.contains('liked')) {
             counter.textContent = parseInt(counter.textContent) - 1;
             ico.textContent = '♡';
@@ -591,23 +517,18 @@
     }
 
     function togglePlay() {
-        var ico = document.getElementById('playIco');
+        const ico = document.getElementById('playIco');
         if (player.paused) { player.play(); ico.textContent = '⏸'; }
         else               { player.pause(); ico.textContent = '▶'; }
     }
 
     function updateTrack(idx) {
         currentIdx = idx;
-        var t = playlist[currentIdx];
+        const t = playlist[currentIdx];
         player.src = R2_URL + encodeURIComponent(t.file);
         document.getElementById('videoTitle').textContent = t.title;
-        document.getElementById('playIco').textContent = '⏸';
         player.load();
-
-        // Chiedi un nuovo preroll solo se IMA è già inizializzato
-        if (imaInitialized) {
-            requestPreroll();
-        }
+        requestPreroll();
     }
 
     function nextTrack() { updateTrack((currentIdx + 1) % playlist.length); }
