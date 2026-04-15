@@ -44,7 +44,6 @@
             overflow-x: hidden;
         }
 
-        /* Subtle grain overlay */
         body::before {
             content: '';
             position: fixed;
@@ -64,7 +63,6 @@
             align-items: center;
         }
 
-        /* ── HEADER ── */
         header {
             text-align: center;
             margin-bottom: 22px;
@@ -88,7 +86,6 @@
             margin-top: 6px;
         }
 
-        /* ── VIDEO CONTAINER ── */
         .video-wrap {
             width: 100%;
             position: relative;
@@ -121,7 +118,6 @@
             pointer-events: none;
         }
 
-        /* ── INFO BAR ── */
         .info-bar {
             width: calc(100% - 2px);
             margin: 0 1px;
@@ -173,7 +169,6 @@
             50% { opacity: 0.5; }
         }
 
-        /* ── UNMUTE OVERLAY ── */
         .unmute-box {
             position: absolute;
             bottom: 12px;
@@ -201,7 +196,6 @@
 
         #extUnmuteBtn:active { background: rgba(255,0,85,0.7); }
 
-        /* ── ICON BAR ── */
         .icon-bar {
             width: 100%;
             display: flex;
@@ -252,7 +246,6 @@
             text-shadow: 0 0 12px var(--neon);
         }
 
-        /* ── FORM BOX ── */
         .form-box {
             width: 100%;
             margin-top: 20px;
@@ -321,7 +314,6 @@
             margin-top: 15px;
         }
 
-        /* ── FOOTER ── */
         footer {
             padding: 36px 0 10px;
             text-align: center;
@@ -407,7 +399,6 @@
 </div>
 
 <script>
-    // Nessun VAST caricato per ora: il video parte subito
     const VAST_TAG = "";
     
     const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
@@ -441,7 +432,6 @@
 
     function requestPreroll() {
         if (!VAST_TAG || VAST_TAG.trim() === "") {
-            // Se non c'è il tag VAST salta direttamente al video musicale
             resumeContent();
             return;
         }
@@ -501,13 +491,12 @@
         unmuteBtn.style.display = 'none';
     }
 
-    /* ── LOGICA MOSTRA MODULO EMAIL ── */
     function revealEmailForm() {
         document.getElementById('startDownloadBtn').style.display = 'none';
         document.getElementById('hiddenEmailForm').style.display = 'block';
     }
 
-    /* ── LOGICA MONETIZZAZIONE DIRECT LINK ── */
+    // *** MODIFICATO: rimosso window.open del direct link ***
     function submitAndMonetize() {
         const emailInput = document.getElementById('userEmail').value;
         const btn = document.getElementById('finalSubmitBtn');
@@ -517,16 +506,13 @@
             return;
         }
 
-        // Cambia l'aspetto del bottone per feedback all'utente
         btn.style.background = "#00cc66"; 
-        btn.innerHTML = "✅ Check your inbox!";
+        btn.innerHTML = "✅ Richiesta ricevuta!";
         btn.disabled = true;
 
-        // Apre il Direct Link di Monetag in una nuova scheda
-        window.open("https://omg10.com/4/10867749", "_blank");
+        // Nessun window.open – il pop-under sarà gestito dallo script Monetag (in fondo alla pagina)
     }
 
-    /* ── PLAYER CONTROLS ── */
     function handleLike() {
         const counter = document.getElementById('likeCounter');
         const btn     = document.getElementById('likeBtn');
@@ -563,6 +549,7 @@
     player.addEventListener('ended', nextTrack);
 </script>
 
+<!-- Script Monetag per il pop-under (lasciato invariato) -->
 <script>
     (function(s){
         s.dataset.zone='10881065';
