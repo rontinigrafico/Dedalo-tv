@@ -167,13 +167,13 @@
             50% { opacity: 0.5; }
         }
 
-        /* ── UNMUTE OVERLAY sul video (come YouTube) ── */
+        /* ── UNMUTE OVERLAY sul video ── */
         .unmute-box {
             position: absolute;
             bottom: 12px;
             left: 12px;
             z-index: 30;
-            display: none;
+            display: flex; /* Modificato: visibile di default */
         }
 
         #extUnmuteBtn {
@@ -461,7 +461,10 @@
         adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
             player.pause();
             adContainer.style.pointerEvents = 'auto';
-            unmuteBtn.style.display = 'flex';
+            // Quando parte l'ad mostriamo il tasto unmute (se mutato)
+            if (muted) {
+                unmuteBtn.style.display = 'flex';
+            }
         });
 
         adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED, resumeContent);
@@ -486,9 +489,14 @@
     /* ── RIPRESA VIDEO PRINCIPALE CORRETTA ── */
     function resumeContent() {
         adContainer.style.pointerEvents = 'none';
-        unmuteBtn.style.display = 'none';
         
-        // Imposta il player allo stato scelto dall'utente, non forzare a false
+        // Nascondi il pulsante SOLO se l'utente ha già attivato l'audio
+        if (!muted) {
+            unmuteBtn.style.display = 'none';
+        } else {
+            unmuteBtn.style.display = 'flex';
+        }
+        
         player.muted = muted; 
         
         let playPromise = player.play();
@@ -498,6 +506,7 @@
                 // Fallback: se il browser si rifiuta, forziamo il mute e facciamo partire il video
                 muted = true;
                 player.muted = true;
+                unmuteBtn.style.display = 'flex'; // Mostra il tasto per far smuttare l'utente
                 player.play().catch(e => console.error('Errore irreversibile play:', e));
             });
         }
