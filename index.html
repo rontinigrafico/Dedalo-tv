@@ -4,9 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>DEDALO TV</title>
-    
+
     <meta name="clckd" content="85003d2ef9da9dd4105a5304988da328" />
 
+    <!-- 1. IMA SDK — PRIMO, prima di tutto -->
+    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+
+    <!-- 2. Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- 3. Microsoft Clarity — DOPO IMA, async/defer per non bloccare -->
     <script type="text/javascript">
         (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -14,12 +23,6 @@
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         })(window, document, "clarity", "script", "wc3el9wrd5");
     </script>
-
-    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -44,7 +47,6 @@
             overflow-x: hidden;
         }
 
-        /* Subtle grain overlay */
         body::before {
             content: '';
             position: fixed;
@@ -64,7 +66,6 @@
             align-items: center;
         }
 
-        /* ── HEADER ── */
         header {
             text-align: center;
             margin-bottom: 22px;
@@ -88,7 +89,6 @@
             margin-top: 6px;
         }
 
-        /* ── VIDEO CONTAINER ── */
         .video-wrap {
             width: 100%;
             position: relative;
@@ -113,7 +113,6 @@
             display: block;
         }
 
-        /* IMA ad container */
         #adContainer {
             position: absolute;
             top: 0; left: 0;
@@ -122,7 +121,6 @@
             pointer-events: none;
         }
 
-        /* ── INFO BAR ── */
         .info-bar {
             width: calc(100% - 2px);
             margin: 0 1px;
@@ -157,7 +155,6 @@
             margin-top: 2px;
         }
 
-        /* Live badge */
         .live-badge {
             background: var(--neon);
             color: #fff;
@@ -175,7 +172,6 @@
             50% { opacity: 0.5; }
         }
 
-        /* ── UNMUTE OVERLAY sul video ── */
         .unmute-box {
             position: absolute;
             bottom: 12px;
@@ -203,7 +199,6 @@
 
         #extUnmuteBtn:active { background: rgba(255,0,85,0.7); }
 
-        /* ── ICON BAR ── */
         .icon-bar {
             width: 100%;
             display: flex;
@@ -254,7 +249,6 @@
             text-shadow: 0 0 12px var(--neon);
         }
 
-        /* ── FORM BOX ── */
         .form-box {
             width: 100%;
             margin-top: 20px;
@@ -322,7 +316,6 @@
 
         .sub-btn:active { opacity: 0.85; transform: scale(0.98); }
 
-        /* ── FOOTER ── */
         footer {
             padding: 36px 0 10px;
             text-align: center;
@@ -333,7 +326,6 @@
             width: 100%;
         }
 
-        /* ── ANIMATIONS ── */
         @keyframes fadeDown {
             from { opacity: 0; transform: translateY(-12px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -404,9 +396,7 @@
 </div>
 
 <script>
-    // Tag VAST di Adcash
     const VAST_TAG = "https://youradexchange.com/video/select.php?r=11187574";
-    
     const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
 
     const playlist = [
@@ -414,119 +404,168 @@
         { file: "Future Voyage - Badret.mp4",               title: "BADRET — Future Voyage" }
     ];
 
-    let currentIdx = 0;
-    let adsLoader, adsManager, adDisplayContainer;
-    let imaReady   = false;
-    let muted      = true; // Stato del volume globale
+    let currentIdx     = 0;
+    let adsLoader      = null;
+    let adsManager     = null;
+    let adDisplayContainer = null;
+    let muted          = true;
+    let imaInitialized = false;
 
     const player      = document.getElementById('mainPlayer');
     const adContainer = document.getElementById('adContainer');
     const unmuteBtn   = document.getElementById('extUnmuteBtn');
 
-    /* ── INIT IMA al load ── */
-    window.addEventListener('load', () => {
-        adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, player);
-        adDisplayContainer.initialize();
+    /* ─────────────────────────────────────────
+       ATTENDI IMA SDK con polling attivo
+       (Clarity async non deve bloccare IMA)
+    ───────────────────────────────────────── */
+    function waitForIMA(callback, maxAttempts, attempt) {
+        maxAttempts = maxAttempts || 30;
+        attempt     = attempt     || 0;
 
-        adsLoader = new google.ima.AdsLoader(adDisplayContainer);
-        adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, onAdsManagerLoaded, false);
-        adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError, false);
-
-        player.muted = true;
-
-        // Gestione corretta dell'autoplay iniziale
-        let playPromise = player.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(() => { /* Ignora se il browser blocca l'autoplay istantaneo */ });
-        }
-
-        // Leggero delay per garantire che l'interfaccia abbia dimensioni valide prima della richiesta
-        setTimeout(requestPreroll, 150);
-    });
-
-    /* ── RICHIEDI PREROLL ── */
-    function requestPreroll() {
-        if (adsManager) { adsManager.destroy(); adsManager = null; }
-        imaReady = false;
-
-        const req = new google.ima.AdsRequest();
-        req.adTagUrl = VAST_TAG;
-        // Fallback di sicurezza se la larghezza/altezza non è ancora calcolata dal browser
-        req.linearAdSlotWidth  = player.offsetWidth > 0 ? player.offsetWidth : 640;
-        req.linearAdSlotHeight = player.offsetHeight > 0 ? player.offsetHeight : 360;
-        req.setAdWillAutoPlay(true);
-        req.setAdWillPlayMuted(true);
-        
-        adsLoader.requestAds(req);
-    }
-
-    function onAdsManagerLoaded(e) {
-        adsManager = e.getAdsManager(player);
-        imaReady   = true;
-
-        adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
-
-        adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
-            player.pause();
-            adContainer.style.pointerEvents = 'auto';
-            // Quando parte l'ad mostriamo il tasto unmute (se mutato)
-            if (muted) {
-                unmuteBtn.style.display = 'flex';
-            }
-        });
-
-        adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED, resumeContent);
-        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, resumeContent);
-        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, resumeContent);
-        adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, resumeContent);
-
-        try {
-            adsManager.init(
-                player.offsetWidth > 0 ? player.offsetWidth : 640, 
-                player.offsetHeight > 0 ? player.offsetHeight : 360, 
-                google.ima.ViewMode.NORMAL
-            );
-            adsManager.setVolume(muted ? 0 : 1);
-            adsManager.start();
-        } catch(err) {
-            console.warn('IMA start error:', err);
+        if (typeof google !== 'undefined' && google.ima) {
+            callback();
+        } else if (attempt < maxAttempts) {
+            setTimeout(function() {
+                waitForIMA(callback, maxAttempts, attempt + 1);
+            }, 200);
+        } else {
+            console.warn('IMA SDK non disponibile dopo ' + (maxAttempts * 200) + 'ms — fallback a content.');
             resumeContent();
         }
     }
 
-    /* ── RIPRESA VIDEO PRINCIPALE CORRETTA ── */
-    function resumeContent() {
-        adContainer.style.pointerEvents = 'none';
-        
-        // Nascondi il pulsante SOLO se l'utente ha già attivato l'audio
-        if (!muted) {
-            unmuteBtn.style.display = 'none';
-        } else {
-            unmuteBtn.style.display = 'flex';
+    /* ─────────────────────────────────────────
+       INIT
+    ───────────────────────────────────────── */
+    window.addEventListener('load', function() {
+        // Avvia il video silenzioso subito
+        player.muted = true;
+        player.play().catch(function() {});
+
+        // Aspetta IMA prima di fare qualsiasi cosa con gli ad
+        waitForIMA(function() {
+            initAdDisplayContainer();
+            requestPreroll();
+        });
+    });
+
+    function initAdDisplayContainer() {
+        if (imaInitialized) return;
+        adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, player);
+        adDisplayContainer.initialize();
+
+        adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+        adsLoader.addEventListener(
+            google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+            onAdsManagerLoaded,
+            false
+        );
+        adsLoader.addEventListener(
+            google.ima.AdErrorEvent.Type.AD_ERROR,
+            onAdError,
+            false
+        );
+
+        imaInitialized = true;
+    }
+
+    /* ─────────────────────────────────────────
+       RICHIEDI PREROLL
+    ───────────────────────────────────────── */
+    function requestPreroll() {
+        if (!imaInitialized) return;
+
+        // Distruggi eventuali adsManager precedenti
+        if (adsManager) {
+            adsManager.destroy();
+            adsManager = null;
         }
-        
-        player.muted = muted; 
-        
-        let playPromise = player.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.warn('Autoplay bloccato. Avvio silenziato per non bloccare il player.', error);
-                // Fallback: se il browser si rifiuta, forziamo il mute e facciamo partire il video
-                muted = true;
-                player.muted = true;
-                unmuteBtn.style.display = 'flex'; // Mostra il tasto per far smuttare l'utente
-                player.play().catch(e => console.error('Errore irreversibile play:', e));
-            });
+
+        var w = player.offsetWidth  > 0 ? player.offsetWidth  : 640;
+        var h = player.offsetHeight > 0 ? player.offsetHeight : 360;
+
+        var req = new google.ima.AdsRequest();
+        req.adTagUrl             = VAST_TAG;
+        req.linearAdSlotWidth    = w;
+        req.linearAdSlotHeight   = h;
+        req.setAdWillAutoPlay(true);
+        req.setAdWillPlayMuted(true);
+
+        try {
+            adsLoader.requestAds(req);
+        } catch(e) {
+            console.warn('requestAds error:', e);
+            resumeContent();
         }
     }
 
+    /* ─────────────────────────────────────────
+       ADS MANAGER LOADED
+    ───────────────────────────────────────── */
+    function onAdsManagerLoaded(e) {
+        adsManager = e.getAdsManager(player);
+
+        adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
+        adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, onAdStarted);
+        adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED,             resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE,            resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED,   resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, resumeContent);
+
+        var w = player.offsetWidth  > 0 ? player.offsetWidth  : 640;
+        var h = player.offsetHeight > 0 ? player.offsetHeight : 360;
+
+        try {
+            adsManager.init(w, h, google.ima.ViewMode.NORMAL);
+            adsManager.setVolume(0); // Sempre muto all'inizio
+            adsManager.start();
+        } catch(err) {
+            console.warn('adsManager.start() error:', err);
+            resumeContent();
+        }
+    }
+
+    function onAdStarted() {
+        player.pause();
+        adContainer.style.pointerEvents = 'auto';
+        unmuteBtn.style.display = 'flex'; // Mostra sempre unmute durante l'ad
+    }
+
+    /* ─────────────────────────────────────────
+       RIPRESA CONTENUTO
+    ───────────────────────────────────────── */
+    function resumeContent() {
+        adContainer.style.pointerEvents = 'none';
+        unmuteBtn.style.display = muted ? 'flex' : 'none';
+        player.muted = muted;
+
+        player.play().catch(function(error) {
+            console.warn('Autoplay bloccato, forzo mute:', error);
+            muted = true;
+            player.muted = true;
+            unmuteBtn.style.display = 'flex';
+            player.play().catch(function(e) {
+                console.error('Play definitivamente bloccato:', e);
+            });
+        });
+    }
+
+    /* ─────────────────────────────────────────
+       AD ERROR
+    ───────────────────────────────────────── */
     function onAdError(e) {
-        console.warn('IMA error:', e.getError());
-        if (adsManager) adsManager.destroy();
+        console.warn('IMA Ad Error:', e.getError ? e.getError() : e);
+        if (adsManager) {
+            adsManager.destroy();
+            adsManager = null;
+        }
         resumeContent();
     }
 
-    /* ── UNMUTE ── */
+    /* ─────────────────────────────────────────
+       UNMUTE
+    ───────────────────────────────────────── */
     function activateSound() {
         muted = false;
         player.muted = false;
@@ -534,11 +573,13 @@
         unmuteBtn.style.display = 'none';
     }
 
-    /* ── PLAYER CONTROLS ── */
+    /* ─────────────────────────────────────────
+       PLAYER CONTROLS
+    ───────────────────────────────────────── */
     function handleLike() {
-        const counter = document.getElementById('likeCounter');
-        const btn     = document.getElementById('likeBtn');
-        const ico     = btn.querySelector('.ico');
+        var counter = document.getElementById('likeCounter');
+        var btn     = document.getElementById('likeBtn');
+        var ico     = btn.querySelector('.ico');
         if (btn.classList.contains('liked')) {
             counter.textContent = parseInt(counter.textContent) - 1;
             ico.textContent = '♡';
@@ -550,19 +591,23 @@
     }
 
     function togglePlay() {
-        const ico = document.getElementById('playIco');
+        var ico = document.getElementById('playIco');
         if (player.paused) { player.play(); ico.textContent = '⏸'; }
         else               { player.pause(); ico.textContent = '▶'; }
     }
 
     function updateTrack(idx) {
         currentIdx = idx;
-        const t = playlist[currentIdx];
+        var t = playlist[currentIdx];
         player.src = R2_URL + encodeURIComponent(t.file);
         document.getElementById('videoTitle').textContent = t.title;
         document.getElementById('playIco').textContent = '⏸';
         player.load();
-        requestPreroll();
+
+        // Chiedi un nuovo preroll solo se IMA è già inizializzato
+        if (imaInitialized) {
+            requestPreroll();
+        }
     }
 
     function nextTrack() { updateTrack((currentIdx + 1) % playlist.length); }
