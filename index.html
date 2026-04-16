@@ -399,7 +399,8 @@
 </div>
 
 <script>
-    const VAST_TAG = "";
+    // TAG VAST di HilltopAds
+    const VAST_TAG = "https://baggymaintenance.com/d.m/F/zFdUGMNhvAZYGpUt/Be/mO9/u_Z-U/ltkjP/TCYj5ONHTVQUwmMnDgEctONvjckd1/NFD/AdwvNbQW";
     
     const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
 
@@ -496,21 +497,54 @@
         document.getElementById('hiddenEmailForm').style.display = 'block';
     }
 
-    // *** MODIFICATO: rimosso window.open del direct link ***
+    // Invia i dati del modulo a FormSpree
     function submitAndMonetize() {
-        const emailInput = document.getElementById('userEmail').value;
+        const nickname = document.getElementById('userNick').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
         const btn = document.getElementById('finalSubmitBtn');
         
-        if(emailInput === "" || !emailInput.includes("@")) {
+        if (!email || !email.includes("@")) {
             alert("Please enter a valid email address!");
             return;
         }
 
-        btn.style.background = "#00cc66"; 
-        btn.innerHTML = "✅ Richiesta ricevuta!";
+        // Disabilita il bottone e mostra stato di invio
         btn.disabled = true;
+        btn.innerHTML = "⏳ Invio in corso...";
 
-        // Nessun window.open – il pop-under sarà gestito dallo script Monetag (in fondo alla pagina)
+        // Prepara i dati per FormSpree
+        const formData = new FormData();
+        formData.append('nickname', nickname);
+        formData.append('email', email);
+
+        // Invia a FormSpree
+        fetch('https://formspree.io/f/mnjokbww', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                btn.style.background = "#00cc66";
+                btn.innerHTML = "✅ Check your inbox!";
+                // Resetta il modulo dopo 3 secondi (opzionale)
+                setTimeout(() => {
+                    document.getElementById('userNick').value = '';
+                    document.getElementById('userEmail').value = '';
+                }, 3000);
+            } else {
+                throw new Error('Errore dal server');
+            }
+        })
+        .catch(error => {
+            console.error('FormSpree error:', error);
+            alert("Si è verificato un errore. Riprova più tardi.");
+            btn.disabled = false;
+            btn.innerHTML = "✉️ Get Access Now";
+            btn.style.background = ""; // ripristina colore originale
+        });
     }
 
     function handleLike() {
@@ -547,14 +581,6 @@
     function prevTrack() { updateTrack((currentIdx - 1 + playlist.length) % playlist.length); }
 
     player.addEventListener('ended', nextTrack);
-</script>
-
-<!-- Script Monetag per il pop-under (lasciato invariato) -->
-<script>
-    (function(s){
-        s.dataset.zone='10881065';
-        s.src='https://al5sm.com/tag.min.js';
-    })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
 </script>
 
 </body>
