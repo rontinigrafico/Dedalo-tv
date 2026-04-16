@@ -21,7 +21,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Brevo stylesheet (richiesto da main.js per il corretto funzionamento) -->
     <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
 
     <style>
@@ -483,13 +482,11 @@
 <body>
 <div class="wrapper">
 
-    <!-- HEADER -->
     <header>
         <img src="https://i.ibb.co/pj8cty5q/Dedalo-Logo.png" class="logo-img" alt="DEDALO">
         <div class="brand">Music Distribution</div>
     </header>
 
-    <!-- VIDEO PLAYER -->
     <div class="video-wrap">
         <div class="video-container">
             <video id="mainPlayer" playsinline muted loop>
@@ -509,7 +506,6 @@
         </div>
     </div>
 
-    <!-- CONTROLLI -->
     <div class="icon-bar">
         <button class="icon-btn" id="likeBtn" onclick="handleLike()">
             <span class="ico">♡</span>
@@ -529,11 +525,6 @@
         </button>
     </div>
 
-    <!-- ===================== MODULO BREVO ORIGINALE =====================
-         Struttura DOM identica all'originale generato da Brevo.
-         Lo stile viene sovrascritto interamente dai CSS qui sopra.
-         NON modificare la struttura HTML interna — Brevo main.js dipende da essa.
-    ====================================================================== -->
     <div class="sib-form">
         <div id="sib-form-container" class="sib-form-container">
 
@@ -561,14 +552,12 @@
                       action="https://636e2ef7.sibforms.com/serve/MUIFAIB2V9Yiy_XdxaTKEiwAD_hfAwzD1lWbl4BIhsaW5iuc94VmDNEGRgHNdUxaY4wxTNEkNgpvDPk_AmEry7ENtQd6C6I25PdbEMqgYk1fUH6Gz0PLjlss9QBePCI4L743WdwuuX6qpMga3VwRvFv_GvtKOzzbv6SFwv1wuGMR8pnU6oCTD6jCr-AHYKodotXq1ZIg-F-grPRp"
                       data-type="subscription">
 
-                    <!-- Titolo -->
                     <div style="padding: 8px 0;">
                         <div class="sib-form-block" style="font-size:16px; text-align:center; font-weight:700; font-family:Futura, sans-serif; color:#ffffff; background-color:transparent;">
                             <p>Unlock HQ Pack</p>
                         </div>
                     </div>
 
-                    <!-- Sottotitolo -->
                     <div style="padding: 8px 0;">
                         <div class="sib-form-block" style="font-size:12px; text-align:center; font-family:Helvetica, sans-serif; color:#c9cbce; background-color:transparent;">
                             <div class="sib-text-form-block">
@@ -577,7 +566,6 @@
                         </div>
                     </div>
 
-                    <!-- Campo EMAIL — struttura originale Brevo, necessaria per main.js -->
                     <div style="padding: 8px 0;">
                         <div class="sib-input sib-form-block">
                             <div class="form__entry entry_block">
@@ -595,7 +583,6 @@
                         </div>
                     </div>
 
-                    <!-- Checkbox opt-in -->
                     <div style="padding: 8px 0;">
                         <div class="sib-optin sib-form-block">
                             <div class="form__entry entry_mcq">
@@ -622,11 +609,9 @@
                         </div>
                     </div>
 
-                    <!-- Dichiarazione privacy Brevo -->
                     <div style="padding: 8px 0;">
                         <div class="sib-form__declaration" style="direction:ltr">
                             <div class="declaration-block-icon">
-                                <!-- icona nascosta via CSS -->
                                 <svg class="icon__SVG" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg">
                                     <defs>
                                         <symbol id="svgIcon-sphere" viewBox="0 0 63 63">
@@ -645,7 +630,6 @@
                         </div>
                     </div>
 
-                    <!-- reCAPTCHA — usa id="sib-captcha" come richiesto da Brevo -->
                     <div style="padding: 8px 0;">
                         <div class="sib-captcha sib-form-block">
                             <div class="form__entry entry_block">
@@ -664,7 +648,6 @@
                         </div>
                     </div>
 
-                    <!-- Pulsante submit -->
                     <div style="padding: 8px 0;">
                         <div class="sib-form-block" style="text-align:center;">
                             <button class="sib-form-block__button sib-form-block__button-with-loader"
@@ -678,21 +661,17 @@
                         </div>
                     </div>
 
-                    <!-- Campi anti-spam Brevo — obbligatori, non rimuovere -->
                     <input type="text" name="email_address_check" value="" class="input--hidden">
                     <input type="hidden" name="locale" value="it">
                 </form>
             </div>
         </div>
     </div>
-    <!-- ===================== FINE MODULO BREVO ===================== -->
-
     <footer>DEDALO © 2026</footer>
 </div>
 
-<!-- ===================== PLAYER ===================== -->
 <script>
-    const VAST_TAG = "https://baggymaintenance.com/d.m/F/zFdUGMNhvAZYGpUt/Be/mO9/u_Z-U/ltkjP/TCYj5ONHTVQUwmMnDgEctONvjckd1/NFD/AdwvNbQW";
+    const VAST_TAG = "https://vast.yomeno.xyz/vast?spot_id=1488210";
     const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
 
     const playlist = [
@@ -817,7 +796,6 @@
     player.addEventListener('ended', nextTrack);
 </script>
 
-<!-- ===================== BREVO CONFIG + SCRIPTS ===================== -->
 <script>
     window.REQUIRED_CODE_ERROR_MESSAGE = 'Scegli un prefisso paese';
     window.LOCALE = 'it';
