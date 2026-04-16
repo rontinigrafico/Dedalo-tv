@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>DEDALO TV</title>
-    
+
     <meta name="clckd" content="85003d2ef9da9dd4105a5304988da328" />
 
     <script type="text/javascript">
@@ -244,18 +244,13 @@
             text-shadow: 0 0 12px var(--neon);
         }
 
-        /* MODULO BREVO SENZA RIGHE BIANCHE */
-        .sib-form, .sib-form-container, #sib-container, .sib-container--vertical {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
+        /* ===================== FORM SECTION ===================== */
+        .form-section {
+            width: 100%;
+            padding: 24px 0 8px;
+            animation: fadeUp 0.6s 0.35s ease both;
         }
-        /* Nascondi eventuali div aggiuntivi di Brevo */
-        .sib-form-message-panel, .sib-hide-loader-icon, .sib-loader, .sib-form__declaration {
-            background: transparent !important;
-        }
+
         .form-custom-title {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 20px;
@@ -264,6 +259,7 @@
             text-align: center;
             margin-bottom: 6px;
         }
+
         .form-custom-sub {
             font-family: 'DM Sans', sans-serif;
             font-size: 11px;
@@ -272,9 +268,10 @@
             text-align: center;
             margin-bottom: 18px;
         }
+
         .custom-email-input {
             width: 100%;
-            background: #000000 !important;
+            background: #000 !important;
             border: 1px solid #333 !important;
             border-radius: 10px !important;
             padding: 14px 16px !important;
@@ -282,30 +279,37 @@
             font-family: 'DM Sans', sans-serif !important;
             font-size: 13px !important;
             margin-bottom: 10px;
+            display: block;
         }
+
         .custom-email-input:focus {
             border-color: var(--neon) !important;
             outline: none;
             background: #0a0a0a !important;
         }
+
         .custom-checkbox {
             display: flex;
             align-items: flex-start;
             gap: 8px;
             margin: 12px 0 6px;
         }
+
         .custom-checkbox input {
             width: 16px;
             height: 16px;
             margin-top: 2px;
             accent-color: var(--neon);
+            flex-shrink: 0;
         }
+
         .custom-checkbox label {
             font-family: 'DM Sans', sans-serif;
             font-size: 11px;
             color: #ccc;
             line-height: 1.3;
         }
+
         .custom-small-text {
             font-family: 'DM Sans', sans-serif;
             font-size: 10px;
@@ -313,6 +317,7 @@
             margin: 5px 0 12px;
             text-align: left;
         }
+
         .privacy-text {
             font-family: 'DM Sans', sans-serif;
             font-size: 9px;
@@ -320,13 +325,14 @@
             text-align: center;
             margin: 15px 0 10px;
         }
+
         .privacy-text a {
             color: #888;
             text-decoration: none;
         }
-        .privacy-text a:hover {
-            color: var(--neon);
-        }
+
+        .privacy-text a:hover { color: var(--neon); }
+
         .custom-submit-btn {
             width: 100%;
             background: var(--neon);
@@ -343,10 +349,17 @@
             transition: opacity 0.15s, transform 0.1s;
             margin-top: 8px;
         }
+
         .custom-submit-btn:active {
             opacity: 0.85;
             transform: scale(0.98);
         }
+
+        .custom-submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .captcha-wrapper {
             background: #0d0d0d;
             border: 1px solid #222;
@@ -357,14 +370,29 @@
             transform: scale(0.92);
             transform-origin: 0 0;
         }
-        /* Forza la trasparenza anche per i messaggi di errore/successo */
-        .sib-form-message-panel {
-            background: rgba(0,0,0,0.9) !important;
-            border: none !important;
-            color: white !important;
-            border-radius: 8px !important;
-            margin-bottom: 15px !important;
+
+        .form-msg {
+            display: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: 'DM Sans', sans-serif;
+            margin-bottom: 14px;
+            text-align: center;
         }
+
+        .form-msg.success {
+            background: rgba(0,200,80,0.12);
+            border: 1px solid rgba(0,200,80,0.3);
+            color: #4ddd88;
+        }
+
+        .form-msg.error {
+            background: rgba(255,0,85,0.1);
+            border: 1px solid rgba(255,0,85,0.3);
+            color: #ff6688;
+        }
+
         footer {
             padding: 36px 0 10px;
             text-align: center;
@@ -432,52 +460,89 @@
         </button>
     </div>
 
-    <!-- MODULO BREVO RIDISEGNATO SENZA RETTANGOLI BIANCHI -->
-    <div class="sib-form">
-        <div id="sib-form-container" class="sib-form-container">
-            <div id="error-message" class="sib-form-message-panel" style="display: none;"></div>
-            <div id="success-message" class="sib-form-message-panel" style="display: none;"></div>
-            <div id="sib-container">
-                <form id="sib-form" method="POST" action="https://636e2ef7.sibforms.com/serve/MUIFAIB2V9Yiy_XdxaTKEiwAD_hfAwzD1lWbl4BIhsaW5iuc94VmDNEGRgHNdUxaY4wxTNEkNgpvDPk_AmEry7ENtQd6C6I25PdbEMqgYk1fUH6Gz0PLjlss9QBePCI4L743WdwuuX6qpMga3VwRvFv_GvtKOzzbv6SFwv1wuGMR8pnU6oCTD6jCr-AHYKodotXq1ZIg-F-grPRp" data-type="subscription">
-                    
-                    <div class="form-custom-title">UNLOCK HQ PACK</div>
-                    <div class="form-custom-sub">Stems, Lossless &amp; Exclusive Remixes</div>
-                    
-                    <input class="custom-email-input" type="email" id="EMAIL" name="EMAIL" placeholder="EMAIL" required>
-                    
-                    <div class="custom-checkbox">
-                        <input type="checkbox" id="OPT_IN" name="OPT_IN" value="1">
-                        <label for="OPT_IN">Accetto le condizioni generali e di ricevere le newsletter</label>
-                    </div>
-                    <div class="custom-small-text">Puoi annullare l'iscrizione in qualsiasi momento utilizzando il link incluso nella nostra newsletter.</div>
-                    
-                    <div class="privacy-text">
-                        Utilizziamo Brevo come piattaforma di marketing. Inviando questo modulo, accetti che i dati personali da te forniti vengano trasferiti a Brevo per il trattamento in conformità <a href="https://www.brevo.com/it/legal/privacypolicy/" target="_blank">all'Informativa sulla privacy di Brevo.</a>
-                    </div>
-                    
-                    <div style="text-align: center;">
-                        <div class="captcha-wrapper">
-                            <div class="g-recaptcha" data-sitekey="6LdEU7osAAAAAEqCZ-RZNDRD6fa971PBsIkDEPlG" data-callback="handleCaptchaResponse"></div>
+    <!-- ===================== MODULO BREVO CORRETTO ===================== -->
+    <!--
+        IMPORTANTE: Questo form usa la struttura nativa attesa da Brevo main.js.
+        NON usare campi custom fuori dal form — Brevo inietterebbe un secondo campo.
+        Il form viene stilizzato tramite CSS che sovrascrive le classi Brevo native.
+    -->
+    <div class="form-section">
+        <div class="form-custom-title">UNLOCK HQ PACK</div>
+        <div class="form-custom-sub">Stems, Lossless &amp; Exclusive Remixes</div>
+
+        <div class="sib-form" style="background:transparent;padding:0;border:none;">
+            <div id="sib-form-container" class="sib-form-container" style="background:transparent;padding:0;border:none;">
+
+                <div id="error-message" class="form-msg error"></div>
+                <div id="success-message" class="form-msg success">
+                    ✓ Iscrizione confermata! Controlla la tua email.
+                </div>
+
+                <div id="sib-container" style="background:transparent;padding:0;border:none;">
+                    <form id="sib-form"
+                          method="POST"
+                          action="https://636e2ef7.sibforms.com/serve/MUIFAIB2V9Yiy_XdxaTKEiwAD_hfAwzD1lWbl4BIhsaW5iuc94VmDNEGRgHNdUxaY4wxTNEkNgpvDPk_AmEry7ENtQd6C6I25PdbEMqgYk1fUH6Gz0PLjlss9QBePCI4L743WdwuuX6qpMga3VwRvFv_GvtKOzzbv6SFwv1wuGMR8pnU6oCTD6jCr-AHYKodotXq1ZIg-F-grPRp"
+                          data-type="subscription"
+                          style="background:transparent;padding:0;border:none;">
+
+                        <!--
+                            CAMPO EMAIL: usa la classe Brevo nativa "input--text" insieme alla nostra custom.
+                            Così Brevo lo riconosce E lo stiliamo correttamente.
+                        -->
+                        <input
+                            class="custom-email-input input--text"
+                            type="email"
+                            id="EMAIL"
+                            name="EMAIL"
+                            placeholder="EMAIL"
+                            autocomplete="email"
+                            required
+                        >
+
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="OPT_IN" name="OPT_IN" value="1">
+                            <label for="OPT_IN">Accetto le condizioni generali e di ricevere le newsletter</label>
                         </div>
-                    </div>
-                    
-                    <button class="custom-submit-btn" type="submit">🎵 DOWNLOAD FREE</button>
-                    
-                    <input type="text" name="email_address_check" value="" class="input--hidden">
-                    <input type="hidden" name="locale" value="it">
-                </form>
+                        <div class="custom-small-text">Puoi annullare l'iscrizione in qualsiasi momento utilizzando il link incluso nella nostra newsletter.</div>
+
+                        <div class="privacy-text">
+                            Utilizziamo Brevo come piattaforma di marketing. Inviando questo modulo, accetti che i dati personali da te forniti vengano trasferiti a Brevo per il trattamento in conformità
+                            <a href="https://www.brevo.com/it/legal/privacypolicy/" target="_blank">all'Informativa sulla privacy di Brevo.</a>
+                        </div>
+
+                        <div style="text-align:center;">
+                            <div class="captcha-wrapper">
+                                <div class="g-recaptcha"
+                                     data-sitekey="6LdEU7osAAAAAEqCZ-RZNDRD6fa971PBsIkDEPlG"
+                                     data-callback="handleCaptchaResponse"></div>
+                            </div>
+                        </div>
+
+                        <button class="custom-submit-btn" type="submit" id="submitBtn">🎵 DOWNLOAD FREE</button>
+
+                        <!-- Campi obbligatori per Brevo anti-spam -->
+                        <input type="text" name="email_address_check" value="" style="position:absolute;left:-9999px;opacity:0;height:0;" tabindex="-1" aria-hidden="true">
+                        <input type="hidden" name="locale" value="it">
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+    <!-- ===================== FINE MODULO ===================== -->
 
     <footer>DEDALO © 2026</footer>
 </div>
 
+<!-- ===================== PLAYER SCRIPT ===================== -->
 <script>
-    // TAG VAST HilltopAds
+    /*
+     * FIX VAST: HilltopAds richiede HTTPS. Se il tag originale è HTTP,
+     * il browser lo blocca come "mixed content" su pagine servite via HTTPS.
+     * Sostituisci il tag con la versione HTTPS fornita dal tuo account HilltopAds.
+     */
     const VAST_TAG = "https://baggymaintenance.com/d.m/F/zFdUGMNhvAZYGpUt/Be/mO9/u_Z-U/ltkjP/TCYj5ONHTVQUwmMnDgEctONvjckd1/NFD/AdwvNbQW";
-    
-    const R2_URL   = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
+
+    const R2_URL = "https://pub-c22608bd1fae47369612e237f3e1971c.r2.dev/";
 
     const playlist = [
         { file: "Red Think - Badret - Official video.mp4",  title: "BADRET — Red Think" },
@@ -488,16 +553,25 @@
     let adsLoader, adsManager, adDisplayContainer;
     let muted = true;
 
-    const player = document.getElementById('mainPlayer');
+    const player     = document.getElementById('mainPlayer');
     const adContainer = document.getElementById('adContainer');
-    const unmuteBtn = document.getElementById('extUnmuteBtn');
+    const unmuteBtn  = document.getElementById('extUnmuteBtn');
 
     window.addEventListener('load', () => {
+        // IMA SDK deve essere caricato prima di inizializzare
+        if (typeof google === 'undefined' || !google.ima) {
+            console.warn('IMA SDK non disponibile, salto gli annunci.');
+            resumeContent();
+            return;
+        }
+
         adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, player);
         adDisplayContainer.initialize();
+
         adsLoader = new google.ima.AdsLoader(adDisplayContainer);
         adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, onAdsManagerLoaded, false);
         adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError, false);
+
         player.muted = true;
         player.play().catch(() => {});
         setTimeout(requestPreroll, 150);
@@ -508,7 +582,7 @@
         if (adsManager) adsManager.destroy();
         const req = new google.ima.AdsRequest();
         req.adTagUrl = VAST_TAG;
-        req.linearAdSlotWidth = player.offsetWidth || 640;
+        req.linearAdSlotWidth  = player.offsetWidth  || 640;
         req.linearAdSlotHeight = player.offsetHeight || 360;
         req.setAdWillAutoPlay(true);
         req.setAdWillPlayMuted(true);
@@ -523,9 +597,9 @@
             adContainer.style.pointerEvents = 'auto';
             if (muted) unmuteBtn.style.display = 'flex';
         });
-        adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED, resumeContent);
-        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, resumeContent);
-        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED,               resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE,               resumeContent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED,      resumeContent);
         adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, resumeContent);
         try {
             adsManager.init(player.offsetWidth || 640, player.offsetHeight || 360, google.ima.ViewMode.NORMAL);
@@ -547,6 +621,7 @@
     }
 
     function onAdError(e) {
+        console.warn('Ad error:', e.getError ? e.getError().toString() : e);
         if (adsManager) adsManager.destroy();
         resumeContent();
     }
@@ -576,7 +651,7 @@
     function togglePlay() {
         const ico = document.getElementById('playIco');
         if (player.paused) { player.play(); ico.textContent = '⏸'; }
-        else { player.pause(); ico.textContent = '▶'; }
+        else               { player.pause(); ico.textContent = '▶'; }
     }
 
     function updateTrack(idx) {
@@ -593,45 +668,94 @@
     function prevTrack() { updateTrack((currentIdx - 1 + playlist.length) % playlist.length); }
 
     player.addEventListener('ended', nextTrack);
+
+    // reCAPTCHA callback (richiesto da Brevo)
+    function handleCaptchaResponse(token) {
+        // Brevo gestisce il token automaticamente via main.js
+    }
 </script>
 
-<!-- Script Brevo e reCAPTCHA -->
+<!-- ===================== BREVO + reCAPTCHA ===================== -->
 <script>
     window.REQUIRED_CODE_ERROR_MESSAGE = 'Scegli un prefisso paese';
     window.LOCALE = 'it';
-    window.EMAIL_INVALID_MESSAGE = "Email non valida";
-    window.REQUIRED_ERROR_MESSAGE = "Campo obbligatorio";
-    window.GENERIC_INVALID_MESSAGE = "Dati non validi";
+    window.EMAIL_INVALID_MESSAGE    = "Email non valida";
+    window.REQUIRED_ERROR_MESSAGE   = "Campo obbligatorio";
+    window.GENERIC_INVALID_MESSAGE  = "Dati non validi";
     window.translation = {
         common: {
-            selectedList: '{quantity} lista selezionata',
-            selectedLists: '{quantity} liste selezionate',
-            selectedOption: '{quantity} selezionato',
+            selectedList:    '{quantity} lista selezionata',
+            selectedLists:   '{quantity} liste selezionate',
+            selectedOption:  '{quantity} selezionato',
             selectedOptions: '{quantity} selezionati',
         }
     };
     var AUTOHIDE = Boolean(0);
 </script>
+
+<!--
+    main.js di Brevo: deve essere caricato DOPO la definizione delle variabili sopra.
+    Il defer garantisce che il DOM sia pronto prima dell'esecuzione.
+-->
 <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
 <script src="https://www.google.com/recaptcha/api.js?hl=it"></script>
 
-<!-- Rimuove eventuali rettangoli bianchi residui dopo il caricamento -->
+<!-- ===================== FIX BREVO STILI POST-LOAD ===================== -->
 <script>
+    /*
+     * Brevo main.js inietta elementi DOM dopo il caricamento.
+     * Questo script rimuove i residui con background bianco e
+     * impedisce la duplicazione del campo email.
+     */
     (function() {
-        // Rimuovi eventuali div vuoti o con sfondo bianco
-        setTimeout(function() {
-            let allDivs = document.querySelectorAll('.sib-form, .sib-container, .sib-form-message-panel');
-            allDivs.forEach(div => {
-                if (div.style.backgroundColor === 'rgb(255, 255, 255)' || div.style.background === 'white') {
-                    div.style.backgroundColor = 'transparent';
-                    div.style.background = 'transparent';
-                }
+        function fixBrevoStyles() {
+            // Rendi trasparenti tutti i contenitori Brevo
+            document.querySelectorAll(
+                '.sib-form, .sib-container, .sib-form-container, #sib-container, .sib-form-message-panel, .entry__field'
+            ).forEach(el => {
+                el.style.background    = 'transparent';
+                el.style.backgroundColor = 'transparent';
+                el.style.border        = 'none';
+                el.style.boxShadow     = 'none';
+                el.style.padding       = '0';
+                el.style.margin        = '0';
             });
-            // Nascondi eventuali loader o icone bianche
-            let loaders = document.querySelectorAll('.sib-loader, .progress-indicator');
-            loaders.forEach(l => l.style.display = 'none');
-        }, 100);
+
+            // Nascondi loader e icone bianche
+            document.querySelectorAll('.sib-loader, .progress-indicator, .sib-hide-loader-icon').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            /*
+             * FIX DUPLICAZIONE CAMPO EMAIL:
+             * Brevo potrebbe aggiungere un wrapper .entry__field attorno al campo email
+             * oppure inserire un secondo input. Rimuoviamo eventuali duplicati.
+             */
+            const emailInputs = document.querySelectorAll('input[name="EMAIL"]');
+            if (emailInputs.length > 1) {
+                // Mantieni solo il primo (il nostro), rimuovi gli altri
+                for (let i = 1; i < emailInputs.length; i++) {
+                    const parent = emailInputs[i].closest('.entry__field') || emailInputs[i].parentNode;
+                    if (parent && parent !== document.getElementById('sib-form')) {
+                        parent.remove();
+                    } else {
+                        emailInputs[i].remove();
+                    }
+                }
+            }
+
+            // Nascondi eventuali label aggiunte da Brevo sopra il nostro campo (spesso vuote)
+            document.querySelectorAll('.entry__label').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+
+        // Esegui subito e poi di nuovo dopo che main.js ha avuto tempo di agire
+        setTimeout(fixBrevoStyles, 200);
+        setTimeout(fixBrevoStyles, 800);
+        setTimeout(fixBrevoStyles, 1500);
     })();
 </script>
+
 </body>
 </html>
