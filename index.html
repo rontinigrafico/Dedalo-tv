@@ -244,19 +244,18 @@
             text-shadow: 0 0 12px var(--neon);
         }
 
-        /* ===== MODULO BREVO RIDISE GNATO ===== */
-        .sib-form {
-            width: 100%;
-            margin-top: 20px;
-        }
-        /* Nascondo i contenitori di default di Brevo per sostituirli con il mio stile */
-        .sib-form-container, #sib-container {
+        /* MODULO BREVO SENZA RIGHE BIANCHE */
+        .sib-form, .sib-form-container, #sib-container, .sib-container--vertical {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
+            margin: 0 !important;
         }
-        /* Titolo e sottotitolo come prima (font originali) */
+        /* Nascondi eventuali div aggiuntivi di Brevo */
+        .sib-form-message-panel, .sib-hide-loader-icon, .sib-loader, .sib-form__declaration {
+            background: transparent !important;
+        }
         .form-custom-title {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 20px;
@@ -273,7 +272,6 @@
             text-align: center;
             margin-bottom: 18px;
         }
-        /* Campo email personalizzato: sfondo nero, bordo arrotondato, testo bianco */
         .custom-email-input {
             width: 100%;
             background: #000000 !important;
@@ -284,14 +282,12 @@
             font-family: 'DM Sans', sans-serif !important;
             font-size: 13px !important;
             margin-bottom: 10px;
-            transition: border-color 0.2s;
         }
         .custom-email-input:focus {
             border-color: var(--neon) !important;
             outline: none;
             background: #0a0a0a !important;
         }
-        /* Checkbox e testi */
         .custom-checkbox {
             display: flex;
             align-items: flex-start;
@@ -331,7 +327,6 @@
         .privacy-text a:hover {
             color: var(--neon);
         }
-        /* Bottone */
         .custom-submit-btn {
             width: 100%;
             background: var(--neon);
@@ -352,7 +347,6 @@
             opacity: 0.85;
             transform: scale(0.98);
         }
-        /* reCAPTCHA wrapper scuro */
         .captcha-wrapper {
             background: #0d0d0d;
             border: 1px solid #222;
@@ -363,17 +357,13 @@
             transform: scale(0.92);
             transform-origin: 0 0;
         }
-        .g-recaptcha {
-            display: inline-block;
-        }
-        /* Messaggi di errore/successo personalizzati */
+        /* Forza la trasparenza anche per i messaggi di errore/successo */
         .sib-form-message-panel {
-            background: rgba(0,0,0,0.9);
-            border-radius: 8px;
-            margin-bottom: 15px;
-            padding: 10px;
-            text-align: center;
-            font-size: 12px;
+            background: rgba(0,0,0,0.9) !important;
+            border: none !important;
+            color: white !important;
+            border-radius: 8px !important;
+            margin-bottom: 15px !important;
         }
         footer {
             padding: 36px 0 10px;
@@ -442,7 +432,7 @@
         </button>
     </div>
 
-    <!-- MODULO BREVO RICOSTRUITO CON GRAFICA RICHESTA -->
+    <!-- MODULO BREVO RIDISEGNATO SENZA RETTANGOLI BIANCHI -->
     <div class="sib-form">
         <div id="sib-form-container" class="sib-form-container">
             <div id="error-message" class="sib-form-message-panel" style="display: none;"></div>
@@ -450,33 +440,27 @@
             <div id="sib-container">
                 <form id="sib-form" method="POST" action="https://636e2ef7.sibforms.com/serve/MUIFAIB2V9Yiy_XdxaTKEiwAD_hfAwzD1lWbl4BIhsaW5iuc94VmDNEGRgHNdUxaY4wxTNEkNgpvDPk_AmEry7ENtQd6C6I25PdbEMqgYk1fUH6Gz0PLjlss9QBePCI4L743WdwuuX6qpMga3VwRvFv_GvtKOzzbv6SFwv1wuGMR8pnU6oCTD6jCr-AHYKodotXq1ZIg-F-grPRp" data-type="subscription">
                     
-                    <!-- Titolo e sottotitolo originali -->
                     <div class="form-custom-title">UNLOCK HQ PACK</div>
                     <div class="form-custom-sub">Stems, Lossless &amp; Exclusive Remixes</div>
                     
-                    <!-- Campo EMAIL con sfondo nero e bordo arrotondato visibile -->
                     <input class="custom-email-input" type="email" id="EMAIL" name="EMAIL" placeholder="EMAIL" required>
                     
-                    <!-- Checkbox condizioni -->
                     <div class="custom-checkbox">
                         <input type="checkbox" id="OPT_IN" name="OPT_IN" value="1">
                         <label for="OPT_IN">Accetto le condizioni generali e di ricevere le newsletter</label>
                     </div>
                     <div class="custom-small-text">Puoi annullare l'iscrizione in qualsiasi momento utilizzando il link incluso nella nostra newsletter.</div>
                     
-                    <!-- Privacy policy Brevo -->
                     <div class="privacy-text">
                         Utilizziamo Brevo come piattaforma di marketing. Inviando questo modulo, accetti che i dati personali da te forniti vengano trasferiti a Brevo per il trattamento in conformità <a href="https://www.brevo.com/it/legal/privacypolicy/" target="_blank">all'Informativa sulla privacy di Brevo.</a>
                     </div>
                     
-                    <!-- reCAPTCHA -->
                     <div style="text-align: center;">
                         <div class="captcha-wrapper">
                             <div class="g-recaptcha" data-sitekey="6LdEU7osAAAAAEqCZ-RZNDRD6fa971PBsIkDEPlG" data-callback="handleCaptchaResponse"></div>
                         </div>
                     </div>
                     
-                    <!-- Bottone DOWNLOAD FREE -->
                     <button class="custom-submit-btn" type="submit">🎵 DOWNLOAD FREE</button>
                     
                     <input type="text" name="email_address_check" value="" class="input--hidden">
@@ -611,7 +595,7 @@
     player.addEventListener('ended', nextTrack);
 </script>
 
-<!-- Script Brevo (necessari per il funzionamento dei messaggi e invio) -->
+<!-- Script Brevo e reCAPTCHA -->
 <script>
     window.REQUIRED_CODE_ERROR_MESSAGE = 'Scegli un prefisso paese';
     window.LOCALE = 'it';
@@ -631,37 +615,22 @@
 <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
 <script src="https://www.google.com/recaptcha/api.js?hl=it"></script>
 
-<!-- Gestione manuale dei messaggi di errore/successo per adattarli al nuovo layout -->
+<!-- Rimuove eventuali rettangoli bianchi residui dopo il caricamento -->
 <script>
     (function() {
-        // Attendi che il DOM sia pronto
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('sib-form');
-            const errorDiv = document.getElementById('error-message');
-            const successDiv = document.getElementById('success-message');
-            
-            // Intercetta l'evento di submit per mostrare/nascondere i messaggi (Brevo lo fa già, ma rinforziamo)
-            form.addEventListener('submit', function(e) {
-                // Lasciamo fare a Brevo, ma assicuriamoci che i div siano pronti
+        // Rimuovi eventuali div vuoti o con sfondo bianco
+        setTimeout(function() {
+            let allDivs = document.querySelectorAll('.sib-form, .sib-container, .sib-form-message-panel');
+            allDivs.forEach(div => {
+                if (div.style.backgroundColor === 'rgb(255, 255, 255)' || div.style.background === 'white') {
+                    div.style.backgroundColor = 'transparent';
+                    div.style.background = 'transparent';
+                }
             });
-            
-            // Osserva le modifiche ai div dei messaggi (Brevo li popola dinamicamente)
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                        // Se error-message diventa visible
-                        if (errorDiv.style.display !== 'none' && errorDiv.innerText.trim() !== '') {
-                            // Personalizza il testo se necessario
-                        }
-                        if (successDiv.style.display !== 'none' && successDiv.innerText.trim() !== '') {
-                            // Personalizza
-                        }
-                    }
-                });
-            });
-            observer.observe(errorDiv, { attributes: true });
-            observer.observe(successDiv, { attributes: true });
-        });
+            // Nascondi eventuali loader o icone bianche
+            let loaders = document.querySelectorAll('.sib-loader, .progress-indicator');
+            loaders.forEach(l => l.style.display = 'none');
+        }, 100);
     })();
 </script>
 </body>
